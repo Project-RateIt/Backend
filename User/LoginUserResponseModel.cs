@@ -2,14 +2,14 @@ using rateit.Helpers;
 
 namespace rateit.User;
 
-public class LoginUserRequestModel
+public class LoginUserResponseModel
 {
-    public LoginUserRequestModel(string email, string password)
+    public LoginUserResponseModel(Models.User user, string token)
     {
-        Email = email;
-        Password = password;
+        User = user;
+        Token = token;
     }
     
-    public string Email {get;}
-    public string Password {get;}
+    public Models.User User {get;}
+    public string Token {get;}
 }

@@ -2,14 +2,11 @@ using rateit.Helpers;
 
 namespace rateit.User;
 
-public class LoginUserResponseModel
+public class IsUserExistRequestModel : Request
 {
-    public LoginUserResponseModel(Models.User user, string token)
+    public IsUserExistRequestModel(int id, string token) : base(token)
     {
-        User = user;
-        Token = token;
+        Id = id;
     }
-    
-    public Models.User User {get;}
-    public string Token {get;}
+    public int Id {get;}
 }

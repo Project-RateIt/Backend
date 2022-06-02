@@ -10,7 +10,7 @@ public class EmailManager : IEmailManager
     public async Task SendEmail(string email)
     {
         using MailMessage msg = new();
-        msg.From = new MailAddress("rzejan@gmail.com");
+        msg.From = new MailAddress("eparafiadev@gmail.com");
         msg.To.Add(email);
         msg.Subject = "Eparafia Test";
         msg.Body = "Test";
