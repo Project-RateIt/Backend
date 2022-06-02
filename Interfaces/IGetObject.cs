@@ -2,5 +2,5 @@ namespace rateit;
 
 public interface IGetObject
 {
-    //public Task<User> GetUser(int id);
+    Task<Models.User> GetUser(int id);
 }
