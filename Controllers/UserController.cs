@@ -52,7 +52,7 @@ public class UserController : ControllerBase
         
         Models.User user;
         
-        try
+        try 
         {
             user = await _getObject.GetUser(id);
         }
