@@ -46,7 +46,10 @@ public class UserController : ControllerBase
             throw new Exception("EmailIsExist");
         
         await _sqlManager.Execute($"INSERT INTO users.users VALUES({id}, '{request.Name}', '{request.Surname}', '{request.Email}',false, '{BCrypt.Net.BCrypt.HashPassword(request.Password, SaltRevision.Revision2Y)}');");
-
+        await _sqlManager.Execute($"CREATE TABLE user_details.last_view_products_{id} (productid int);");
+        await _sqlManager.Execute($"CREATE TABLE user_details.rated_products_{id} (productid int, rate int);");
+        await _sqlManager.Execute($"CREATE TABLE user_details.my_product_{id} (productid int, note varchar);");
+        
         Models.User user;
         
         try
@@ -60,10 +63,8 @@ public class UserController : ControllerBase
         //await _emailManager.SendEmail(user.Email);
         //TODO send mail email and verification
 
-
         return new ObjectResult(user);
     }
-
     [HttpPost($"{BaseUrl}/login")]
     public async Task<IActionResult> Login(LoginUserRequestModel request)
     {
