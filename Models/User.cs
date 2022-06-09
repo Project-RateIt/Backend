@@ -2,18 +2,17 @@ namespace rateit.Models;
 
 public class User
 {
-    public int Id;
-    public string Name;
-    public string Surname;
-    public string Email;
-    public bool IsActivated;
+    public int Id             {get;} 
+    public string Name        {get;}
+    public string Surname     {get;}
+    public string Email       {get;}
+    public bool IsActivated   {get;}
 
-    public User(int id, string name, string surname, string email, bool isActivated)
+    public User(int id, string name, string surname, string email)
     {
         Id = id;
         Name = name;
         Surname = surname;
         Email = email;
-        IsActivated = isActivated;
     }
 }

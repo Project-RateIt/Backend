@@ -30,8 +30,8 @@ public class UserController : ControllerBase
         _tokenVerification = tokenVerification;
     }
     
-    [HttpPost($"{BaseUrl}/registerUser")]
-    public async Task<IActionResult> ExampleEndpoint(UserRegisterRequestModel request)
+    [HttpPost($"{BaseUrl}/register")]
+    public async Task<IActionResult> Register(UserRegisterRequestModel request)
     {
         int id;         
         while (true)
@@ -41,6 +41,9 @@ public class UserController : ControllerBase
             if (!await _sqlManager.IsValueExist($"SELECT * FROM users.users WHERE id = {id};"))
                 break;
         }
+
+        if (await _sqlManager.IsValueExist($"SELECT * FROM users.users WHERE email = '{request.Email}';"))
+            throw new Exception("EmailIsExist");
         
         await _sqlManager.Execute($"INSERT INTO users.users VALUES({id}, '{request.Name}', '{request.Surname}', '{request.Email}',false, '{BCrypt.Net.BCrypt.HashPassword(request.Password, SaltRevision.Revision2Y)}');");
 
@@ -54,8 +57,10 @@ public class UserController : ControllerBase
         {
             return StatusCode(409, "UnexpectedException");
         }
-        await _emailManager.SendEmail(user.Email);
-        
+        //await _emailManager.SendEmail(user.Email);
+        //TODO send mail email and verification
+
+
         return new ObjectResult(user);
     }
 
@@ -66,9 +71,12 @@ public class UserController : ControllerBase
 
         if (await _sqlManager.IsValueExist($"SELECT id FROM users.users WHERE email = '{request.Email}';"))
         {
-            var data = (await _sqlManager.Reader(
-                $"SELECT id, password, isactive FROM users.users WHERE email = '{request.Email}';"))[0];
+            var data = (await _sqlManager.Reader($"SELECT id, password, isactivated FROM users.users WHERE email = '{request.Email}';"))[0];
 
+            if (!data["isactivated"])
+            {
+                return StatusCode(409, "UserIsNotActive");
+            }
             if (BCrypt.Net.BCrypt.Verify(request.Password, data["password"]))
             {
                 user = await _getObject.GetUser(data["id"]);
@@ -76,11 +84,6 @@ public class UserController : ControllerBase
             else
             {
                 return StatusCode(409, "BadPassword");
-            }
-
-            if (!data["isactive"])
-            {
-                return StatusCode(409, "UserIsNotActive");
             }
         }
         else
@@ -140,6 +143,13 @@ public class UserController : ControllerBase
             case SettingsMode.Email:
             {
                 await _sqlManager.Execute($"UPDATE users.users SET email = '{request.Value}' WHERE id = {request.Id};");
+                break;
+            }
+            case SettingsMode.Avatar:
+            {
+                await System.IO.File.WriteAllTextAsync($@"Avatars\{request.Id}", request.Value.ToString());
+                await _sqlManager.Execute($"UPDATE users.users SET hasAvatar = true WHERE id = {request.Id};");
+
                 break;
             }
             default:
