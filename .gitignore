@@ -17,3 +17,4 @@ Backend/
 *.targets
 *.info
 *.sentinel
+bin/Debug/net6.0/Avatars
