@@ -1,4 +1,7 @@
-namespace rateit.Helpers;
+using rateit.Helpers;
+using rateit.Interfaces;
+
+namespace rateit.Services;
 
 public class TokenManager : ITokenManager
 {
@@ -12,9 +15,9 @@ public class TokenManager : ITokenManager
     public async Task<bool> UserVerification(string? token, UserType type)
     {
         if(type == UserType.User)
-            return await _sqlManager.IsValueExist($"SELECT * FROM users.users WHERE (token1 = '{token}' OR token2 = '{token}') AND id = {int.Parse(token.Split('_')[1])};");
+            return await _sqlManager.IsValueExist($"SELECT * FROM users.users WHERE (token1 = '{token}' OR token2 = '{token}') AND id = {int.Parse(token?.Split('_')[1] ?? string.Empty)};");
         if(type == UserType.Admin)
-            return await _sqlManager.IsValueExist($"SELECT * FROM users.admin WHERE (token1 = '{token}' OR token2 = '{token}') AND id = {int.Parse(token.Split('_')[1])};");
+            return await _sqlManager.IsValueExist($"SELECT * FROM users.admin WHERE (token1 = '{token}' OR token2 = '{token}') AND id = {int.Parse(token?.Split('_')[1] ?? string.Empty)};");
         return false;
     }
 

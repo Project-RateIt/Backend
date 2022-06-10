@@ -1,5 +1,3 @@
-using rateit.Helpers;
-
 namespace rateit.User;
 
 public class LoginUserRequestModel

@@ -1,17 +1,12 @@
 using System.Data;
 using Npgsql;
+using rateit.Interfaces;
 
 namespace rateit.Services;
 
 public class SqlManager : ISqlManager
 {
-    private const string Host = "194.150.101.246";
-    private const string Password = "!Malinka@pass#database";
-    private const string Username = "postgres";
-    private const string Database = "rateit";
-
-    private const string ConnectionString = $"Host={Host};Username={Username};Password={Password};Database={Database}";
-    private readonly NpgsqlConnection _connection = new NpgsqlConnection(ConnectionString);
+    private readonly NpgsqlConnection _connection = new(System.IO.File.ReadAllTextAsync("SqlConnection").Result);
 
     public async Task<List<Dictionary<string, dynamic>>> Reader(string query)
     {

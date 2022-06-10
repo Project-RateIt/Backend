@@ -1,4 +1,4 @@
-namespace rateit;
+namespace rateit.Interfaces;
 
 public interface IEmailManager
 {

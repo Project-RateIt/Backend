@@ -9,6 +9,7 @@ public class Request
     protected Request()
     {
     }    
+    
     public Request(string? token)
     {
         Token = token;

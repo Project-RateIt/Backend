@@ -9,14 +9,31 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="49107086-9c8a-4122-a943-47b80d1fc3b6" name="Changes" comment="">
-      <change afterPath="$APPLICATION_CONFIG_DIR$/consoles/db/6591dd91-8d9d-4a18-912b-0db08d6ef2d3/console.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/.idea.rateit.dir/.idea/sqldialects.xml" afterDir="false" />
       <change afterPath="$USER_HOME$/WebstormProjects/untitled/.idea/untitled.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.rateit.dir/.idea/sqldialects.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.rateit.dir/.idea/sqldialects.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.rateit.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.rateit.dir/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Controllers/ExampleController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Controllers/ExampleController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Controllers/ProductsController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Controllers/ProductsController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Controllers/UserController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Controllers/UserController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Helpers/CustomExceptions.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Helpers/Request.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Helpers/Request.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Interfaces/IEmailManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Interfaces/IEmailManager.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Interfaces/IGetObject.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Interfaces/IGetObject.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Interfaces/ISqlManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Interfaces/ISqlManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Interfaces/ITokenVerification.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Interfaces/ITokenVerification.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/Product.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Models/Product.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Models/User.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Models/User.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Products/FollowRequestModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Products/FollowRequestModel.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Properties/launchSettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/Properties/launchSettings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Services/EmailManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/EmailManager.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Services/GetObject.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/GetObject.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Services/SqlManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/SqlManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Services/TokenManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/TokenManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/User/LoginUserRequestModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/User/LoginUserRequestModel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/User/LoginUserResponseModel.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/User/UserRegisterRequestModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/User/UserRegisterRequestModel.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/appsettings.Development.json" beforeDir="false" afterPath="$PROJECT_DIR$/appsettings.Development.json" afterDir="false" />
       <change beforePath="$USER_HOME$/eparafia/Eparafia" beforeDir="false" afterPath="$USER_HOME$/eparafia/Eparafia" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -35,7 +52,9 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="2AKjRyaBQGpn1AzxHrcjozphwfX" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />

@@ -1,5 +1,3 @@
-using rateit.Helpers;
-
 namespace rateit.User;
 
 public class UserRegisterRequestModel
@@ -17,3 +15,4 @@ public class UserRegisterRequestModel
     public string Email {get;}
     public string Password {get;}
 }
+

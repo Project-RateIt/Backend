@@ -1,6 +1,6 @@
 using rateit.Helpers;
 
-namespace rateit;
+namespace rateit.Interfaces;
 
 public interface ITokenManager
 {

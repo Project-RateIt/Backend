@@ -2,6 +2,7 @@ using rateit.Helpers;
 
 namespace rateit.Products;
 
+[Serializable]
 public class FollowRequestModel : Request
 {
     public FollowRequestModel(int productId, int userId, string token) : base(token)

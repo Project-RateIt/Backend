@@ -1,6 +1,7 @@
 using BCrypt.Net;
 using Microsoft.AspNetCore.Mvc;
 using rateit.Helpers;
+using rateit.Interfaces;
 using rateit.User;
 
 namespace rateit.Controllers;
@@ -51,7 +52,7 @@ public class UserController : ControllerBase
         {
             user = await _getObject.GetUser(id);
         }
-        catch (UserIsNotExist)
+        catch (Exception)
         {
             return StatusCode(409, "UnexpectedException");
         }
@@ -105,7 +106,7 @@ public class UserController : ControllerBase
         {
             user = await _getObject.GetUser(request.Id);
         }
-        catch (UserIsNotExist)
+        catch (Exception)
         {
             return StatusCode(409, "UserIsNotExist");
         }

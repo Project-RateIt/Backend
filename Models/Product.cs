@@ -1,7 +1,6 @@
-using Microsoft.Extensions.Primitives;
-
 namespace rateit.Models;
 
+[Serializable]
 public class Product
 {
     public Product(string id, string name, int rateSum, int rateCount, bool isFollow, bool isRated, int myRate)

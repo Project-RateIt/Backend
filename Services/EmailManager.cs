@@ -1,8 +1,8 @@
 using System.Net;
 using System.Net.Mail;
-using System.Net.Mime;
+using rateit.Interfaces;
 
-namespace rateit.Helpers;
+namespace rateit.Services;
 
 
 public class EmailManager : IEmailManager
@@ -12,7 +12,7 @@ public class EmailManager : IEmailManager
         using MailMessage msg = new();
         msg.From = new MailAddress("eparafiadev@gmail.com");
         msg.To.Add(email);
-        msg.Subject = "Eparafia Test";
+        msg.Subject = "RateIt Test";
         msg.Body = "Test";
         msg.Priority = MailPriority.High;
         msg.IsBodyHtml = true;

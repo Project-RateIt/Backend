@@ -1,20 +1,15 @@
-using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using rateit.Interfaces;
 using rateit.Models;
 
-
-namespace rateit.Helpers;
+namespace rateit.Services;
 
 public class GetObject : IGetObject
 {
     private readonly ISqlManager _sqlManager;
-    private readonly ILogger<GetObject> _logger;
 
-    public GetObject(ISqlManager sqlManager, ILogger<GetObject> logger)
+    public GetObject(ISqlManager sqlManager)
     {
         _sqlManager = sqlManager;
-        _logger = logger;
     }
 
     public async Task<Models.User> GetUser(int id)

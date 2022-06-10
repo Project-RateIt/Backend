@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using rateit.Helpers;
+using rateit.Interfaces;
 
 namespace rateit.Controllers;
 
