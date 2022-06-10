@@ -1,7 +1,7 @@
 using System.Data;
 using Npgsql;
 
-namespace rateit.Helpers;
+namespace rateit.Services;
 
 public class SqlManager : ISqlManager
 {

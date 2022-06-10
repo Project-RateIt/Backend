@@ -1,5 +1,6 @@
 using rateit;
 using rateit.Helpers;
+using rateit.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,8 +1,6 @@
 using BCrypt.Net;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using rateit.Helpers;
-using rateit.Models;
 using rateit.User;
 
 namespace rateit.Controllers;
@@ -13,18 +11,15 @@ public class UserController : ControllerBase
 {
     private readonly ISqlManager _sqlManager;
     private readonly IGetObject _getObject;
-    private readonly ILogger<UserController> _logger;
     private readonly IEmailManager _emailManager;
     private readonly ITokenManager _tokenVerification;
 
     private const string BaseUrl = "/user";
     
-    public UserController(ISqlManager sqlManager, ILogger<UserController> logger,
-        IGetObject getObject, 
+    public UserController(ISqlManager sqlManager, IGetObject getObject, 
         IEmailManager emailManager, ITokenManager tokenVerification)
     {
         _sqlManager = sqlManager;
-        _logger = logger;
         _getObject = getObject;
         _emailManager = emailManager;
         _tokenVerification = tokenVerification;
@@ -60,6 +55,7 @@ public class UserController : ControllerBase
         {
             return StatusCode(409, "UnexpectedException");
         }
+        
         //await _emailManager.SendEmail(user.Email);
         //TODO send mail email and verification
 
