@@ -62,6 +62,7 @@ public class UserController : ControllerBase
 
         return new ObjectResult(user);
     }
+    
     [HttpPost($"{BaseUrl}/login")]
     public async Task<IActionResult> Login(LoginUserRequestModel request)
     {

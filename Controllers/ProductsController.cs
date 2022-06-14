@@ -80,15 +80,23 @@ public class ProductsController : ControllerBase
             return StatusCode(409, "BadAccessToken");
         }
 
-        if (await _sqlManager.IsValueExist($"SELECT * FROM user_details.rated_products_{request.UserId} WHERE productid = {request.ProductId};"))
+        if (await _sqlManager.IsValueExist($"SELECT * FROM user_details.rated_products_{request.UserId} WHERE productid = '{request.ProductId}';"))
         {
-            await _sqlManager.Execute(
-                $"UPDATE user_details.rated_products_{request.UserId} SET rate = {request.Rate} WHERE productid = {request.ProductId}");
+            int lastMyRate = (await _sqlManager.Reader($"SELECT * FROM user_details.rated_products_{request.UserId} WHERE productid = '{request.ProductId}';"))[0]["rate"];
+            int beforeRate = (await _sqlManager.Reader($"SELECT ratesum FROM products.products WHERE id = '{request.ProductId}';"))[0]["ratesum"];
+
+            int newRate = (beforeRate - lastMyRate) + request.Rate;
+            
+            await _sqlManager.Execute($"UPDATE user_details.rated_products_{request.UserId} SET rate = {request.Rate} WHERE productid = {request.ProductId}");
+            
+            
+            await _sqlManager.Execute($"UPDATE products.products SET ratesum = {newRate} WHERE id = '{request.ProductId}'");
         }
         else
         {
-            await _sqlManager.Execute(
-                $"INSERT INTO user_details.rated_products_{request.UserId} VALUES ({request.ProductId}, {request.Rate})");
+            await _sqlManager.Execute($"INSERT INTO user_details.rated_products_{request.UserId} VALUES ({request.ProductId}, {request.Rate})");
+            await _sqlManager.Execute($"UPDATE products.products SET ratesum = ratesum + {request.Rate} WHERE id = '{request.ProductId}'");
+            await _sqlManager.Execute($"UPDATE products.products SET ratecount = ratecount + 1 WHERE id = '{request.ProductId}'");
         }
         
         return Ok();
@@ -103,8 +111,12 @@ public class ProductsController : ControllerBase
         }
         if (await _sqlManager.IsValueExist($"SELECT * FROM user_details.rated_products_{request.UserId} WHERE productid = {request.ProductId};"))
         {
-            await _sqlManager.Execute(
-                $"DELETE FROM user_details.rated_products_{request.UserId} WHERE productid = {request.ProductId}");
+            int lastMyRate = (await _sqlManager.Reader($"SELECT * FROM user_details.rated_products_{request.UserId} WHERE productid = '{request.ProductId}';"))[0]["rate"];
+
+            await _sqlManager.Execute($"DELETE FROM user_details.rated_products_{request.UserId} WHERE productid = {request.ProductId}");
+            await _sqlManager.Execute($"UPDATE products.products SET ratecount = ratecount - 1 WHERE id = '{request.ProductId}'");
+            await _sqlManager.Execute($"UPDATE products.products SET ratesum = ratesum - {lastMyRate} WHERE id = '{request.ProductId}'");
+
         }
         else
         {
@@ -119,6 +131,12 @@ public class ProductsController : ControllerBase
         {
             return StatusCode(409, "BadAccessToken");
         }
+        
+        
+        bool follow = await _sqlManager.IsValueExist($"SELECT * FROM user_details.my_product_{request.UserId} WHERE productid = {request.ProductId};");
+        if (!follow) return StatusCode(409, "IsNotFollow");
+
+        await _sqlManager.Execute($"UPDATE user_details.my_product_{request.UserId} SET note = '{request.Note}';");
         
         return Ok();
     }    

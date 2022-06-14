@@ -4,12 +4,12 @@ namespace rateit.Products;
 
 public class UnrateRequestModel : Request
 {
-    public UnrateRequestModel(string token, string userId, string productId) : base(token)
+    public UnrateRequestModel(string token, int userId, string productId) : base(token)
     {
         UserId = userId;
         ProductId = productId;
     }
 
-    public string UserId { get;}
+    public int UserId { get;}
     public string ProductId { get; }
 }
