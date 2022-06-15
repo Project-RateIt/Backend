@@ -87,18 +87,20 @@ public class ProductsController : ControllerBase
 
             int newRate = (beforeRate - lastMyRate) + request.Rate;
             
+            
             await _sqlManager.Execute($"UPDATE user_details.rated_products_{request.UserId} SET rate = {request.Rate} WHERE productid = {request.ProductId}");
-            
-            
             await _sqlManager.Execute($"UPDATE products.products SET ratesum = {newRate} WHERE id = '{request.ProductId}'");
         }
         else
         {
-            await _sqlManager.Execute($"INSERT INTO user_details.rated_products_{request.UserId} VALUES ({request.ProductId}, {request.Rate})");
-            await _sqlManager.Execute($"UPDATE products.products SET ratesum = ratesum + {request.Rate} WHERE id = '{request.ProductId}'");
-            await _sqlManager.Execute($"UPDATE products.products SET ratecount = ratecount + 1 WHERE id = '{request.ProductId}'");
+            await _sqlManager.Execute(
+                $"INSERT INTO user_details.rated_products_{request.UserId} VALUES ({request.ProductId}, {request.Rate})");
+            await _sqlManager.Execute(
+                $"UPDATE products.products SET ratesum = ratesum + {request.Rate} WHERE id = '{request.ProductId}'");
+            await _sqlManager.Execute(
+                $"UPDATE products.products SET ratecount = ratecount + 1 WHERE id = '{request.ProductId}'");
         }
-        
+
         return Ok();
         
     }
@@ -139,5 +141,44 @@ public class ProductsController : ControllerBase
         await _sqlManager.Execute($"UPDATE user_details.my_product_{request.UserId} SET note = '{request.Note}';");
         
         return Ok();
-    }    
+    }
+
+    [HttpPost($"{BaseUrl}/getRatedProduct")]
+         public async Task<IActionResult> GetRatedProduct(GetRatedProductsRequestModel request)
+         {
+             if (!await _tokenVerification.UserVerification(request.Token, UserType.User))
+             {
+                 return StatusCode(409, "BadAccessToken");
+             }
+     
+             var data = await _sqlManager.Reader($"SELECT * FROM user_details.rated_products_{request.UserId};");
+     
+     
+             List<Product> products = new List<Product>();
+             foreach (var item in data)
+             {
+                 products.Add(await _getObject.GetProduct(item["id"], request.UserId));
+             }
+     
+             return new ObjectResult(products);
+         }
+         [HttpPost($"{BaseUrl}/getFollowedProduct")]
+         public async Task<IActionResult> GetFollowedProduct(GetRatedProductsRequestModel request)
+         {
+             if (!await _tokenVerification.UserVerification(request.Token, UserType.User))
+             {
+                 return StatusCode(409, "BadAccessToken");
+             }
+
+             var data = await _sqlManager.Reader($"SELECT * FROM user_details.my_product_{request.UserId};");
+
+
+             List<Product> products = new List<Product>();
+             foreach (var item in data)
+             {
+                 products.Add(await _getObject.GetProduct(item["id"], request.UserId));
+             }
+
+             return new ObjectResult(products);
+         }
 }
