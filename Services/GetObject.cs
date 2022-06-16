@@ -30,8 +30,8 @@ public class GetObject : IGetObject
         if (data.Count == 0) throw new Exception("ErrGetProduct");
         var item = data[0];
 
-        bool follow = await _sqlManager.IsValueExist($"SELECT * FROM user_details.my_product_{userId} WHERE productid = {id};");
-        List<Dictionary<string, dynamic>> rateData = await _sqlManager.Reader($"SELECT * FROM user_details.my_product_{userId} WHERE productid = {id};");
+        bool follow = await _sqlManager.IsValueExist($"SELECT * FROM user_details.rated_products_{userId} WHERE productid = {id};");
+        List<Dictionary<string, dynamic>> rateData = await _sqlManager.Reader($"SELECT * FROM user_details.rated_products_{userId} WHERE productid = {id};");
 
         bool rated = rateData.Count > 0;
         int myRate = 0;

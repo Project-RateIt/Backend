@@ -12,6 +12,7 @@
       <change afterPath="$USER_HOME$/WebstormProjects/untitled/.idea/untitled.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.rateit.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.rateit.dir/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Controllers/ProductsController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Controllers/ProductsController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Services/GetObject.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Services/GetObject.cs" afterDir="false" />
       <change beforePath="$USER_HOME$/eparafia/Eparafia" beforeDir="false" afterPath="$USER_HOME$/eparafia/Eparafia" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

@@ -157,7 +157,7 @@ public class ProductsController : ControllerBase
              List<Product> products = new List<Product>();
              foreach (var item in data)
              {
-                 products.Add(await _getObject.GetProduct(item["id"], request.UserId));
+                 products.Add(await _getObject.GetProduct(item["productid"], request.UserId));
              }
      
              return new ObjectResult(products);
@@ -176,7 +176,7 @@ public class ProductsController : ControllerBase
              List<Product> products = new List<Product>();
              foreach (var item in data)
              {
-                 products.Add(await _getObject.GetProduct(item["id"], request.UserId));
+                 products.Add(await _getObject.GetProduct(item["productid"], request.UserId));
              }
 
              return new ObjectResult(products);
