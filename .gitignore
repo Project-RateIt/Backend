@@ -3,6 +3,8 @@
 *.config
 .idea/.idea.rateit.dir/.idea/.name
 Backend/
+.idea/
+Avatars/
 *.zip
 *.json
 *.exe
