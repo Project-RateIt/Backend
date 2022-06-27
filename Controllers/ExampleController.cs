@@ -38,4 +38,12 @@ public class ExampleController : ControllerBase
         
         return Ok();
     }
+    
+    [HttpGet($"{BaseUrl}/test")]
+    public async Task<IActionResult> Test()
+    {
+        await _sqlManager.Execute($"INSERT INTO xd VALUES (12);");
+        
+        return new ObjectResult(await _sqlManager.Reader($"SELECT * FROM xd;"));
+    }
 }

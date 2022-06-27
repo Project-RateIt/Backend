@@ -23,15 +23,15 @@ public class GetObject : IGetObject
         return user;
     }
 
-    public async Task<Product> GetProduct(int id, int userId)
+    public async Task<Product> GetProduct(string id, int userId)
     {
-        var data = await _sqlManager.Reader($"SELECT * FROM products.products WHERE id = {id};");
+        var data = await _sqlManager.Reader($"SELECT * FROM products.products WHERE id = '{id}';");
 
         if (data.Count == 0) throw new Exception("ErrGetProduct");
         var item = data[0];
 
-        bool follow = await _sqlManager.IsValueExist($"SELECT * FROM user_details.rated_products_{userId} WHERE productid = {id};");
-        List<Dictionary<string, dynamic>> rateData = await _sqlManager.Reader($"SELECT * FROM user_details.rated_products_{userId} WHERE productid = {id};");
+        bool follow = await _sqlManager.IsValueExist($"SELECT * FROM user_details.my_product_{userId} WHERE productid = '{id}';");
+        List<Dictionary<string, dynamic>> rateData = await _sqlManager.Reader($"SELECT * FROM user_details.rated_products_{userId} WHERE productid = '{id}';");
 
         bool rated = rateData.Count > 0;
         int myRate = 0;
@@ -40,7 +40,7 @@ public class GetObject : IGetObject
             myRate = rateData[0]["rate"];
         }
 
-        Product product = new Product(item["id"].ToString(), item["name"], item["ratesum"], item["ratecount"], follow, rated, myRate);
+        Product product = new Product(item["id"].ToString(), item["name"], item["ratesum"], item["ratecount"], follow, rated, myRate, item["img"], item["category"], item["ean"], item["producer"]);
 
         return product;
     }

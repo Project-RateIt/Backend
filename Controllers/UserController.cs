@@ -39,9 +39,9 @@ public class UserController : ControllerBase
         }
 
         if (await _sqlManager.IsValueExist($"SELECT * FROM users.users WHERE email = '{request.Email}';"))
-            throw new Exception("EmailIsExist");
+            return StatusCode(409, "EmailIsExist");
         
-        await _sqlManager.Execute($"INSERT INTO users.users VALUES({id}, '{request.Name}', '{request.Surname}', '{request.Email}',false, '{BCrypt.Net.BCrypt.HashPassword(request.Password, SaltRevision.Revision2Y)}');");
+        await _sqlManager.Execute($"INSERT INTO users.users VALUES({id}, '{request.Name}', '{request.Surname}', '{request.Email}',false, '{BCrypt.Net.BCrypt.HashPassword(request.Password, SaltRevision.Revision2Y)}', '', '');");
         await _sqlManager.Execute($"CREATE TABLE user_details.last_view_products_{id} (productid int);");
         await _sqlManager.Execute($"CREATE TABLE user_details.rated_products_{id} (productid int, rate int);");
         await _sqlManager.Execute($"CREATE TABLE user_details.my_product_{id} (productid int, note varchar);");
@@ -124,9 +124,7 @@ public class UserController : ControllerBase
         }
         if (!await _sqlManager.IsValueExist($"SELECT id FROM users.users WHERE id = {request.Id}"))
             return StatusCode(409, "UserIsNotExist");
-        
 
-        
         switch (request.Mode)
         {
             case SettingsMode.Name:

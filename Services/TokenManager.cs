@@ -38,19 +38,19 @@ public class TokenManager : ITokenManager
         
         if (tokens["token1"] == "")
         {
-            await _sqlManager.Execute($"UPDATE users.users SET token1 = '{newToken}';");
+            await _sqlManager.Execute($"UPDATE users.users SET token1 = '{newToken}' WHERE id = {userId};");
         }
         else if (tokens["token2"] == "")
         {
-            await _sqlManager.Execute($"UPDATE users.users SET token2 = '{newToken}';");
+            await _sqlManager.Execute($"UPDATE users.users SET token2 = '{newToken}' WHERE id = {userId};");
         }
         else if (DateTime.Parse(tokens["token1"].ToString().Split('_')[2]) > DateTime.Parse(tokens["token2"].ToString().Split('_')[2]))
         {
-            await _sqlManager.Execute($"UPDATE users.users SET token2 = '{newToken}';");
+            await _sqlManager.Execute($"UPDATE users.users SET token2 = '{newToken}' WHERE id = {userId};");
         }
         else
         {
-            await _sqlManager.Execute($"UPDATE users.users SET token1 = '{newToken}';");
+            await _sqlManager.Execute($"UPDATE users.users SET token1 = '{newToken}' WHERE id = {userId};");
         }
 
         return newToken;

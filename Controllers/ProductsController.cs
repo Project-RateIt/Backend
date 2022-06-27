@@ -10,6 +10,8 @@ namespace rateit.Controllers;
 [Route("[controller]")]
 public class ProductsController : ControllerBase
 {
+    private const int ObjPerPage = 10;
+    
     private readonly ISqlManager _sqlManager;
     private readonly IGetObject _getObject;
     private readonly ITokenManager _tokenVerification;
@@ -24,24 +26,35 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPost($"{BaseUrl}/search")]
-    public async Task<IActionResult> Search(SearchRequestModel request)
+    public async Task<IActionResult> Search(SearchRequestModel request) 
     {
         if (!await _tokenVerification.UserVerification(request.Token, UserType.User))
         {
             return StatusCode(409, "BadAccessToken");
         }
-        var data = await _sqlManager.Reader($"SELECT id FROM products.products WHERE name LIKE '%{request.Query}%' OR keywords LIKE '%{request.Query}%' ORDER BY sponsor DESC, (ratesum/ratecount) DESC LIMIT {(request.Page + 1) * 10};");
+
+        var data = await _sqlManager.Reader(
+            $"SELECT id FROM products.products WHERE name LIKE '%{request.Query}%' OR category LIKE '%{request.Query}%' ORDER BY sponsor DESC, ((ratesum+1)/(ratecount+1)) DESC LIMIT {(request.Page + 1) * ObjPerPage};");
 
         List<Product> result = new List<Product>();
-        
-        foreach (var item in data)
-        {
-            result.Add(await _getObject.GetProduct(item["id"], request.UserId));         
-        }
 
+
+        
+        for (int i = (request.Page * 1) * ObjPerPage; i != (request.Page + 1)  * ObjPerPage; i++)
+        {
+            try
+            {
+                result.Add(await _getObject.GetProduct(data[i]["id"], request.UserId));
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+        
         return new ObjectResult(result);
     }
-    
+
     [HttpPost($"{BaseUrl}/follow")]
     public async Task<IActionResult> Follow(FollowRequestModel request)
     {
@@ -49,6 +62,12 @@ public class ProductsController : ControllerBase
         {
             return StatusCode(409, "BadAccessToken");
         }
+
+        if (!await _sqlManager.IsValueExist($"SELECT * FROM products.products WHERE id = '{request.ProductId}';"))
+        {
+            return StatusCode(409, "GetProductErr");
+        }
+        
         
         bool follow = await _sqlManager.IsValueExist($"SELECT * FROM user_details.my_product_{request.UserId} WHERE productid = {request.ProductId};");
         if (follow) return StatusCode(409, "IsFollow");
@@ -157,7 +176,7 @@ public class ProductsController : ControllerBase
              List<Product> products = new List<Product>();
              foreach (var item in data)
              {
-                 products.Add(await _getObject.GetProduct(item["productid"], request.UserId));
+                 products.Add(await _getObject.GetProduct(item["productid"].ToString(), request.UserId));
              }
      
              return new ObjectResult(products);
@@ -176,7 +195,7 @@ public class ProductsController : ControllerBase
              List<Product> products = new List<Product>();
              foreach (var item in data)
              {
-                 products.Add(await _getObject.GetProduct(item["productid"], request.UserId));
+                 products.Add(await _getObject.GetProduct(item["productid"].ToString(), request.UserId));
              }
 
              return new ObjectResult(products);
