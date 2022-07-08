@@ -14,18 +14,20 @@ public class ExampleController : ControllerBase
     private readonly ILogger<ExampleController> _logger;
     private readonly IEmailManager _emailManager;
     private readonly ITokenManager _tokenVerification;
+    private readonly IConfiguration _configuration;
 
     private const string BaseUrl = "/example";
     
     public ExampleController(ISqlManager sqlManager, ILogger<ExampleController> logger,
         IGetObject getObject, 
-        IEmailManager emailManager, ITokenManager tokenVerification)
+        IEmailManager emailManager, ITokenManager tokenVerification, IConfiguration configuration)
     {
         _sqlManager = sqlManager;
         _logger = logger;
         _getObject = getObject;
         _emailManager = emailManager;
         _tokenVerification = tokenVerification;
+        _configuration = configuration;
     }
     
     [HttpPost($"{BaseUrl}/ExampleEndpoint")]
@@ -38,9 +40,16 @@ public class ExampleController : ControllerBase
         
         return Ok();
     }
+
+    [HttpPost($"/")]
+    public IActionResult Test()
+    {
+        return new ObjectResult("dziala");
+    } 
+
     
     [HttpGet($"{BaseUrl}/test")]
-    public async Task<IActionResult> Test()
+    public async Task<IActionResult> Test2()
     {
         await _sqlManager.Execute($"INSERT INTO xd VALUES (12);");
         

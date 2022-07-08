@@ -33,9 +33,17 @@ public class ProductsController : ControllerBase
             return StatusCode(409, "BadAccessToken");
         }
 
-        var data = await _sqlManager.Reader(
-            $"SELECT id FROM products.products WHERE name LIKE '%{request.Query}%' OR category LIKE '%{request.Query}%' ORDER BY sponsor DESC, ((ratesum+1)/(ratecount+1)) DESC LIMIT {(request.Page + 1) * ObjPerPage};");
-
+        List<Dictionary<string, dynamic>> data;
+        
+        if (request.Query != "")
+        {
+            data = await _sqlManager.Reader($"SELECT id FROM products.products WHERE lower(name) LIKE lower('{request.Query}%') OR lower(category) LIKE lower('{request.Query}%') OR lower(name) LIKE lower('% {request.Query}%') ORDER BY sponsor DESC, ((ratesum+1)/(ratecount+1)) DESC, id LIMIT {(request.Page + 1) * ObjPerPage};");
+        }
+        else
+        {
+            data = await _sqlManager.Reader($"SELECT id FROM products.products ORDER BY sponsor DESC, ((ratesum+1)/(ratecount+1)) DESC, id LIMIT {(request.Page + 1) * ObjPerPage};");
+        }
+        
         List<Product> result = new List<Product>();
 
 

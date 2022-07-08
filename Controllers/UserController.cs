@@ -57,7 +57,7 @@ public class UserController : ControllerBase
             return StatusCode(409, "UnexpectedException");
         }
         
-        //await _emailManager.SendEmail(user.Email);
+        //await _emailManager.SendEmailActivate(user.Email);
         //TODO send mail email and verification
 
         return new ObjectResult(user);
@@ -153,6 +153,43 @@ public class UserController : ControllerBase
                 throw new ArgumentOutOfRangeException();
         }
 
+        return Ok();
+    }
+
+    [HttpPost($"{BaseUrl}/resetPassword")]
+    public async Task<IActionResult> ResetPassword(ResetPasswordRequestModel request)
+    {
+        if (await _sqlManager.IsValueExist($"SELECT * FROM users.users WHERE email = '{request.Email}';"))
+        {
+            Random random = new Random();
+        
+            string chars = "1234567890qwertyuiopasdfgthjklQWERTYUIOPASDFGHJKLZXCVBNMzxcvbnm";
+            string key = new string(Enumerable.Repeat(chars, 10)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+            await _sqlManager.Execute($"UPDATE users.users SET resetpasskey = '{key}' WHERE email = '{request.Email}';");
+
+            await _emailManager.SendEmailActivate(request.Email);
+        }
+        else
+        {
+            return StatusCode(409, "EmailIsNotExist");
+        }
+        
+        return Ok();
+    }    
+    
+    [HttpGet($"{BaseUrl}/setNewPassword")]
+    public async Task<IActionResult> SetNewPassword(SetNewPasswordRequestModel request)
+    {
+        if (await _sqlManager.IsValueExist($"SELECT * FROM users.users WHERE resetpasskey = '{request.ResetPassKey}';"))
+        {
+            await _sqlManager.Execute($"UPDATE users.users SET password = '{BCrypt.Net.BCrypt.HashPassword(request.NewPassword, SaltRevision.Revision2Y)}' WHERE resetpasskey = '{request.ResetPassKey}';");
+        }
+        else
+        {
+            return StatusCode(409, "UserIsNotExist");
+        }
+        
         return Ok();
     }
 }

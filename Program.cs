@@ -17,14 +17,13 @@ builder.Services.AddSingleton<IGetObject, GetObject>();
 builder.Services.AddSingleton<IEmailManager, EmailManager>();
 builder.Services.AddSingleton<ITokenManager, TokenManager>();
 
-var app = builder.Build();
+var app = builder.Build(); ;
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+//}
 
 app.UseCors();
 
@@ -35,3 +34,4 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
