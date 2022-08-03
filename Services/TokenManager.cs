@@ -35,23 +35,51 @@ public class TokenManager : ITokenManager
 
         var tokens = (await _sqlManager.Reader($"SELECT token1, token2 FROM users.users WHERE id = {userId};"))[0];
 
-        
-        if (tokens["token1"] == "")
+        if (!(await _sqlManager.IsValueExist($"SELECT * FROM users.admin WHERE id = {userId};")))
         {
-            await _sqlManager.Execute($"UPDATE users.users SET token1 = '{newToken}' WHERE id = {userId};");
-        }
-        else if (tokens["token2"] == "")
-        {
-            await _sqlManager.Execute($"UPDATE users.users SET token2 = '{newToken}' WHERE id = {userId};");
-        }
-        else if (DateTime.Parse(tokens["token1"].ToString().Split('_')[2]) > DateTime.Parse(tokens["token2"].ToString().Split('_')[2]))
-        {
-            await _sqlManager.Execute($"UPDATE users.users SET token2 = '{newToken}' WHERE id = {userId};");
+            if (tokens["token1"] == "")
+            {
+                await _sqlManager.Execute($"UPDATE users.users SET token1 = '{newToken}' WHERE id = {userId};");
+            }
+            else if (tokens["token2"] == "")
+            {
+                await _sqlManager.Execute($"UPDATE users.users SET token2 = '{newToken}' WHERE id = {userId};");
+            }
+            else if (DateTime.Parse(tokens["token1"].ToString().Split('_')[2]) >
+                     DateTime.Parse(tokens["token2"].ToString().Split('_')[2]))
+            {
+                await _sqlManager.Execute($"UPDATE users.users SET token2 = '{newToken}' WHERE id = {userId};");
+            }
+            else
+            {
+                await _sqlManager.Execute($"UPDATE users.users SET token1 = '{newToken}' WHERE id = {userId};");
+            }
         }
         else
         {
-            await _sqlManager.Execute($"UPDATE users.users SET token1 = '{newToken}' WHERE id = {userId};");
+            if (tokens["token1"] == "")
+            {
+                await _sqlManager.Execute($"UPDATE users.users SET token1 = '{newToken}' WHERE id = {userId};");
+                await _sqlManager.Execute($"UPDATE users.admin SET token1 = '{newToken}' WHERE id = {userId};");
+            }
+            else if (tokens["token2"] == "")
+            {
+                await _sqlManager.Execute($"UPDATE users.users SET token2 = '{newToken}' WHERE id = {userId};");
+                await _sqlManager.Execute($"UPDATE users.admin SET token2 = '{newToken}' WHERE id = {userId};");
+            }
+            else if (DateTime.Parse(tokens["token1"].ToString().Split('_')[2]) > DateTime.Parse(tokens["token2"].ToString().Split('_')[2]))
+            {
+                await _sqlManager.Execute($"UPDATE users.users SET token2 = '{newToken}' WHERE id = {userId};");
+                await _sqlManager.Execute($"UPDATE users.admin SET token2 = '{newToken}' WHERE id = {userId};");
+            }
+            else
+            {
+                await _sqlManager.Execute($"UPDATE users.users SET token1 = '{newToken}' WHERE id = {userId};");
+                await _sqlManager.Execute($"UPDATE users.admin SET token1 = '{newToken}' WHERE id = {userId};");
+            }
         }
+
+
 
         return newToken;
     }

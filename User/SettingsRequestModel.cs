@@ -2,6 +2,7 @@ using rateit.Helpers;
 
 namespace rateit.User;
 
+[Serializable]
 public class SettingsRequestModel : Request
 {
     public SettingsRequestModel(int id, SettingsMode mode, object value, string token) : base(token)

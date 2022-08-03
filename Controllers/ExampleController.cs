@@ -33,18 +33,15 @@ public class ExampleController : ControllerBase
     [HttpPost($"{BaseUrl}/ExampleEndpoint")]
     public async Task<IActionResult> ExampleEndpoint()
     {
-        if (!await _tokenVerification.UserVerification("token z logowania", UserType.User))
-        {
-            return StatusCode(409, "BadAccessToken");
-        }
-        
         return Ok();
     }
 
     [HttpPost($"/")]
-    public IActionResult Test()
+    public async Task<IActionResult> Test()
     {
-        return new ObjectResult("dziala");
+        int a = 0;
+        
+        return new ObjectResult((1/a));
     } 
 
     

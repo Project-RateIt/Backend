@@ -42,7 +42,7 @@ public class UserController : ControllerBase
             return StatusCode(409, "EmailIsExist");
         
         await _sqlManager.Execute($"INSERT INTO users.users VALUES({id}, '{request.Name}', '{request.Surname}', '{request.Email}',false, '{BCrypt.Net.BCrypt.HashPassword(request.Password, SaltRevision.Revision2Y)}', '', '');");
-        await _sqlManager.Execute($"CREATE TABLE user_details.last_view_products_{id} (productid int);");
+        await _sqlManager.Execute($"CREATE TABLE user_details.last_view_products_{id} (productid int, date date);");
         await _sqlManager.Execute($"CREATE TABLE user_details.rated_products_{id} (productid int, rate int);");
         await _sqlManager.Execute($"CREATE TABLE user_details.my_product_{id} (productid int, note varchar);");
         
@@ -89,9 +89,12 @@ public class UserController : ControllerBase
         {
             return StatusCode(409, "UserIsNotExist");
         }
+        
 
         string newToken = await _tokenVerification.GenerateToken(user.Id);
 
+        bool isAdmin = await _sqlManager.IsValueExist($"SELECT * FROM users.admin WHERE id = {user.Id};");
+        
         return new ObjectResult(new LoginUserResponseModel(user, newToken));
     }
     [HttpPost($"{BaseUrl}/isUserExist")]
@@ -144,8 +147,8 @@ public class UserController : ControllerBase
             }
             case SettingsMode.Avatar:
             {
-                await System.IO.File.WriteAllTextAsync($@"Avatars\{request.Id}", request.Value.ToString());
-                await _sqlManager.Execute($"UPDATE users.users SET hasAvatar = true WHERE id = {request.Id};");
+                await System.IO.File.WriteAllTextAsync($@"/var/www/html/avatars_rateit", request.Value.ToString());
+                await _sqlManager.Execute($"UPDATE users.users SET haveAvatar = true WHERE id = {request.Id};");
 
                 break;
             }

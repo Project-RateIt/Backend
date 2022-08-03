@@ -18,7 +18,7 @@ public class GetObject : IGetObject
 
         if (date.Count == 0) throw new Exception("ErrGetUser");
         
-        Models.User user = new Models.User(date[0]["id"], date[0]["name"], date[0]["surname"], date[0]["email"]);
+        Models.User user = new Models.User(date[0]["id"], date[0]["name"], date[0]["surname"], date[0]["email"], await _sqlManager.IsValueExist($"SELECT * FROM users.admin WHERE id = {id};"), date[0]["haveAvatar"]);
         
         return user;
     }
@@ -30,8 +30,10 @@ public class GetObject : IGetObject
         if (data.Count == 0) throw new Exception("ErrGetProduct");
         var item = data[0];
 
-        bool follow = await _sqlManager.IsValueExist($"SELECT * FROM user_details.my_product_{userId} WHERE productid = '{id}';");
-        List<Dictionary<string, dynamic>> rateData = await _sqlManager.Reader($"SELECT * FROM user_details.rated_products_{userId} WHERE productid = '{id}';");
+        bool follow =
+            await _sqlManager.IsValueExist($"SELECT * FROM user_details.my_product_{userId} WHERE productid = '{id}';");
+        List<Dictionary<string, dynamic>> rateData =
+            await _sqlManager.Reader($"SELECT * FROM user_details.rated_products_{userId} WHERE productid = '{id}';");
 
         bool rated = rateData.Count > 0;
         int myRate = 0;
@@ -39,8 +41,10 @@ public class GetObject : IGetObject
         {
             myRate = rateData[0]["rate"];
         }
+        
+    string category = (await _sqlManager.Reader($"SELECT * FROM products.categories WHERE id = {item["category"]}"))[0]["name"];
 
-        Product product = new Product(item["id"].ToString(), item["name"], item["ratesum"], item["ratecount"], follow, rated, myRate, item["img"], item["category"], item["ean"], item["producer"]);
+    Product product = new Product(item["id"].ToString(), item["name"], item["ratesum"], item["ratecount"], follow, rated, myRate, item["img"], category, item["ean"], item["producer"]);
 
         return product;
     }

@@ -1,8 +1,12 @@
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Newtonsoft.Json;
 using rateit.Helpers;
 using rateit.Interfaces;
 using rateit.Models;
 using rateit.Products;
+using JsonConverter = System.Text.Json.Serialization.JsonConverter;
 
 namespace rateit.Controllers;
 
@@ -10,7 +14,7 @@ namespace rateit.Controllers;
 [Route("[controller]")]
 public class ProductsController : ControllerBase
 {
-    private const int ObjPerPage = 10;
+    private const int ObjPerPage = 20;
     
     private readonly ISqlManager _sqlManager;
     private readonly IGetObject _getObject;
@@ -37,7 +41,7 @@ public class ProductsController : ControllerBase
         
         if (request.Query != "")
         {
-            data = await _sqlManager.Reader($"SELECT id FROM products.products WHERE lower(name) LIKE lower('{request.Query}%') OR lower(category) LIKE lower('{request.Query}%') OR lower(name) LIKE lower('% {request.Query}%') ORDER BY sponsor DESC, ((ratesum+1)/(ratecount+1)) DESC, id LIMIT {(request.Page + 1) * ObjPerPage};");
+            data = await _sqlManager.Reader($"SELECT id FROM products.products WHERE lower(name) LIKE lower('{request.Query}%') OR lower(producer) LIKE lower('% {request.Query}%') OR lower(ean) LIKE lower('% {request.Query}%') ORDER BY sponsor DESC, ((ratesum+1)/(ratecount+1)) DESC, id LIMIT {(request.Page + 1) * ObjPerPage};");
         }
         else
         {
@@ -62,29 +66,8 @@ public class ProductsController : ControllerBase
         
         return new ObjectResult(result);
     }
-
-    [HttpPost($"{BaseUrl}/follow")]
-    public async Task<IActionResult> Follow(FollowRequestModel request)
-    {
-        if (!await _tokenVerification.UserVerification(request.Token, UserType.User))
-        {
-            return StatusCode(409, "BadAccessToken");
-        }
-
-        if (!await _sqlManager.IsValueExist($"SELECT * FROM products.products WHERE id = '{request.ProductId}';"))
-        {
-            return StatusCode(409, "GetProductErr");
-        }
-        
-        
-        bool follow = await _sqlManager.IsValueExist($"SELECT * FROM user_details.my_product_{request.UserId} WHERE productid = {request.ProductId};");
-        if (follow) return StatusCode(409, "IsFollow");
-
-        await _sqlManager.Execute($"INSERT INTO user_details.my_product_{request.UserId} VALUES({request.ProductId}, '')");
-
-        return Ok();
-    }    
-    [HttpPost($"{BaseUrl}/unfollow")]
+    
+    [HttpPost($"{BaseUrl}/deleteNote")]
     public async Task<IActionResult> Unfollow(FollowRequestModel request)
     {
         if (!await _tokenVerification.UserVerification(request.Token, UserType.User))
@@ -93,7 +76,7 @@ public class ProductsController : ControllerBase
         }
         
         bool follow = await _sqlManager.IsValueExist($"SELECT * FROM user_details.my_product_{request.UserId} WHERE productid = {request.ProductId};");
-        if (!follow) return StatusCode(409, "IsNotFollow");
+        if (!follow) return StatusCode(409, "ProductDoesNotHaveNote");
 
         await _sqlManager.Execute($"DELETE FROM user_details.my_product_{request.UserId} WHERE productid = {request.ProductId};");
 
@@ -161,12 +144,8 @@ public class ProductsController : ControllerBase
             return StatusCode(409, "BadAccessToken");
         }
         
-        
-        bool follow = await _sqlManager.IsValueExist($"SELECT * FROM user_details.my_product_{request.UserId} WHERE productid = {request.ProductId};");
-        if (!follow) return StatusCode(409, "IsNotFollow");
 
-        await _sqlManager.Execute($"UPDATE user_details.my_product_{request.UserId} SET note = '{request.Note}';");
-        
+        await _sqlManager.Execute($"INSERT INTO user_details.my_product_{request.UserId} VALUES({request.ProductId}, '{request.Note}')");
         return Ok();
     }
 
@@ -184,12 +163,13 @@ public class ProductsController : ControllerBase
              List<Product> products = new List<Product>();
              foreach (var item in data)
              {
-                 products.Add(await _getObject.GetProduct(item["productid"].ToString(), request.UserId));
+                 products.Add(await _getObject.GetProduct(item["productid"].ToString
+                     (), request.UserId));
              }
      
              return new ObjectResult(products);
          }
-         [HttpPost($"{BaseUrl}/getFollowedProduct")]
+         [HttpPost($"{BaseUrl}/getNotedProduct")]
          public async Task<IActionResult> GetFollowedProduct(GetRatedProductsRequestModel request)
          {
              if (!await _tokenVerification.UserVerification(request.Token, UserType.User))
@@ -207,5 +187,127 @@ public class ProductsController : ControllerBase
              }
 
              return new ObjectResult(products);
+         }         
+         [HttpPost($"{BaseUrl}/addProductByEan")]
+         public async Task<IActionResult> AddProductByEan(AddProductByEanRequestModel request)
+         {
+             if (!await _tokenVerification.UserVerification(request.Token, UserType.User))
+             {
+                 return StatusCode(409, "BadAccessToken");
+             }
+
+             if (await _sqlManager.IsValueExist($"SELECT * FROM products.products WHERE ean = '{request.Ean}';"))
+             {
+                 string id = (await _sqlManager.Reader($"SELECT * FROM products.products WHERE ean = '{request.Ean}';"))[0]["id"].ToString();
+                 return new ObjectResult(await _getObject.GetProduct(id, request.UserId));
+             }
+             else
+             {
+                 HttpClient client = new HttpClient();
+                 HttpResponseMessage response = await client.SendAsync(new HttpRequestMessage(HttpMethod.Get, new Uri($"https://api.barcodelookup.com/v3/products?barcode={request.Ean}&formatted=y&key=i4liud7cw31ebt07j0i5cuphgonvbx")));
+
+                 dynamic content = JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync()) ?? new object();
+
+                 if (response.StatusCode == HttpStatusCode.NotFound) return StatusCode(409, "ProductNotFound");
+                 
+                 int id;         
+                 while (true)
+                 {
+                     Random rand = new Random();
+                     id = rand.Next(100000000, 999999990);          
+                     if (!await _sqlManager.IsValueExist($"SELECT * FROM products.products WHERE id = '{id}';") && !await _sqlManager.IsValueExist($"SELECT * FROM products.orders WHERE id = '{id}';"))
+                         break;
+                 }
+
+                 
+                 
+                 string name = content["products"][0]["title"];
+                 string image = content["products"][0]["images"][0];
+                 string producer = content["products"][0]["category"];
+                 string category = content["products"][0]["brand"];
+                 string ean = request.Ean;
+
+                 
+                 await _sqlManager.Execute($"INSERT INTO products.orders VALUES ('{ean}', {request.UserId}, '{name}', '{id}', '{image}', '{producer}', '{category}');");
+             }
+
+             return Ok();
+         }
+
+         [HttpPost($"{BaseUrl}/viewProduct")]
+         public async Task<IActionResult> ViewProduct(ViewProductRequestModel request)
+         {
+             if (!await _tokenVerification.UserVerification(request.Token, UserType.User))
+             {
+                 return StatusCode(409, "BadAccessToken");
+             }
+             
+             await _sqlManager.Execute($"INSERT INTO user_details.last_view_products_{request.UserId} VALUES({request.ProductId}, NOW());");
+             return Ok();
+         }
+         
+         [HttpPost($"{BaseUrl}/getViewedProduct")]
+         public async Task<IActionResult> GetViewedProduct(GetViewedProductRequestModel request)
+         {
+             if (!await _tokenVerification.UserVerification(request.Token, UserType.User))
+             {
+                 return StatusCode(409, "BadAccessToken");
+             }
+             
+             var data = await _sqlManager.Reader($"SELECT * FROM user_details.last_view_products_{request.UserId} ORDER BY date");
+
+             List<Product> products = new List<Product>();
+
+             for (int i = (request.Page * 1) * ObjPerPage; i != (request.Page + 1) * ObjPerPage; i++)
+             {
+                 try
+                 {
+                     products.Add(await _getObject.GetProduct(data[i]["productid"].ToString(), request.UserId));
+                 }
+                 catch (Exception e)
+                 {
+                     //ignore
+                 }
+             }
+             
+             return new ObjectResult(products);
+         }
+
+
+         [HttpPost($"{BaseUrl}/getCategories")]
+         public async Task<IActionResult> GetCategories(AuthRequestModel request)
+         {
+             if (!await _tokenVerification.UserVerification(request.Token, UserType.User))
+             {
+                 return StatusCode(409, "BadAccessToken");
+             }
+
+             return new ObjectResult(await _sqlManager.Reader($"SELECT * FROM products.categories;"));
+         }         
+         
+         [HttpPost($"{BaseUrl}/getCategoryRanking")]
+         public async Task<IActionResult> GetCategoryRanking(GetCategoryRankingRequestModel request)
+         {
+             if (!await _tokenVerification.UserVerification(request.Token, UserType.User))
+             {
+                 return StatusCode(409, "BadAccessToken");
+             }
+
+             var data = await _sqlManager.Reader($"SELECT * FROM products.products WHERE category = {request.CategoryId} ORDER BY ((ratesum)/(ratecount+1)) DESC LIMIT {ObjPerPage * (request.Page+1)};");
+             List<Product> result = new List<Product>();
+
+             for (int i = (request.Page * 1) * ObjPerPage; i != (request.Page + 1)  * ObjPerPage; i++)
+             {
+                 //try
+                 //{
+                     result.Add(await _getObject.GetProduct(data[i]["id"].ToString(), request.UserId));
+                 //}
+                 //catch
+                 //{
+                 //    // ignored
+                 //}
+             }
+             
+             return new ObjectResult(result);
          }
 }

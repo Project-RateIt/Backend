@@ -1,4 +1,7 @@
+using System.Net.Mime;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.EnvironmentVariables;
 using rateit;
@@ -17,7 +20,13 @@ builder.Services.AddSingleton<IGetObject, GetObject>();
 builder.Services.AddSingleton<IEmailManager, EmailManager>();
 builder.Services.AddSingleton<ITokenManager, TokenManager>();
 
-var app = builder.Build(); ;
+builder.Services.AddMvc(options =>
+{
+    builder.Logging.AddDebug();
+    
+    options.Filters.Add(new ErrorHandlingFilter());
+});
+var app = builder.Build();
 
 //if (app.Environment.IsDevelopment())
 //{
@@ -25,13 +34,17 @@ var app = builder.Build(); ;
     app.UseSwaggerUI();
 //}
 
+
 app.UseCors();
 
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
+
 app.MapControllers();
 
+
 app.Run();
+
 
