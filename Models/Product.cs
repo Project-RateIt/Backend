@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Mvc;
+
 namespace rateit.Models;
 
 [Serializable]
@@ -29,4 +31,5 @@ public class Product
     public string Category { get; }
     public string Ean { get; }
     public string Producer { get; }
+    
 }

@@ -8,6 +8,8 @@ public class SqlManager : ISqlManager
 {
     private readonly NpgsqlConnection _connection = new(System.IO.File.ReadAllTextAsync("SqlConnection").Result);
 
+    
+    
     public async Task<List<Dictionary<string, dynamic>>> Reader(string query)
     {
         try
@@ -50,6 +52,8 @@ public class SqlManager : ISqlManager
 
         try
         {
+            Console.WriteLine(_connection.State != ConnectionState.Closed);
+
             await _connection.OpenAsync();
             await command.ExecuteNonQueryAsync();
         }
@@ -64,6 +68,7 @@ public class SqlManager : ISqlManager
     {
         try
         {
+
             await _connection.OpenAsync();
             NpgsqlCommand command = new NpgsqlCommand(query, _connection);
 

@@ -188,8 +188,8 @@ public class ProductsController : ControllerBase
 
              return new ObjectResult(products);
          }         
-         [HttpPost($"{BaseUrl}/addProductByEan")]
-         public async Task<IActionResult> AddProductByEan(AddProductByEanRequestModel request)
+         [HttpPost($"{BaseUrl}/checkProduct")]
+         public async Task<IActionResult> CheckProduct(CheckProductRequestModel request)
          {
              if (!await _tokenVerification.UserVerification(request.Token, UserType.User))
              {
@@ -209,27 +209,35 @@ public class ProductsController : ControllerBase
                  dynamic content = JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync()) ?? new object();
 
                  if (response.StatusCode == HttpStatusCode.NotFound) return StatusCode(409, "ProductNotFound");
-                 
-                 int id;         
-                 while (true)
-                 {
-                     Random rand = new Random();
-                     id = rand.Next(100000000, 999999990);          
-                     if (!await _sqlManager.IsValueExist($"SELECT * FROM products.products WHERE id = '{id}';") && !await _sqlManager.IsValueExist($"SELECT * FROM products.orders WHERE id = '{id}';"))
-                         break;
-                 }
 
-                 
-                 
                  string name = content["products"][0]["title"];
                  string image = content["products"][0]["images"][0];
                  string producer = content["products"][0]["category"];
                  string category = content["products"][0]["brand"];
                  string ean = request.Ean;
 
-                 
-                 await _sqlManager.Execute($"INSERT INTO products.orders VALUES ('{ean}', {request.UserId}, '{name}', '{id}', '{image}', '{producer}', '{category}');");
+
+                 return new ObjectResult(new Product(0.ToString(), name, 0, 0, false, false, 0, image, category, ean, producer));
              }
+         }         
+         [HttpPost($"{BaseUrl}/addProduct")]
+         public async Task<IActionResult> AddProduct(AddProductRequestModel request)
+         {
+             if (!await _tokenVerification.UserVerification(request.Token, UserType.User))
+             {
+                 return StatusCode(409, "BadAccessToken");
+             }
+             
+             int id;         
+             while (true)
+             {
+                 Random rand = new Random();
+                 id = rand.Next(100000000, 999999990);          
+                 if (!await _sqlManager.IsValueExist($"SELECT * FROM products.products WHERE id = '{id}';") && !await _sqlManager.IsValueExist($"SELECT * FROM products.orders WHERE id = '{id}';"))
+                     break;
+             }
+
+             await _sqlManager.Execute($"INSERT INTO products.orders VALUES ('{request.Ean}', {request.UserId}, '{request.Name}', '{id}', '{request.Image}', '{request.Producer}', {request.CategoryId});");
 
              return Ok();
          }
@@ -296,16 +304,16 @@ public class ProductsController : ControllerBase
              var data = await _sqlManager.Reader($"SELECT * FROM products.products WHERE category = {request.CategoryId} ORDER BY ((ratesum)/(ratecount+1)) DESC LIMIT {ObjPerPage * (request.Page+1)};");
              List<Product> result = new List<Product>();
 
-             for (int i = (request.Page * 1) * ObjPerPage; i != (request.Page + 1)  * ObjPerPage; i++)
+             for (int i = request.Page * ObjPerPage; i != (request.Page + 1)  * ObjPerPage; i++)
              {
-                 //try
-                 //{
+                 try
+                 {
                      result.Add(await _getObject.GetProduct(data[i]["id"].ToString(), request.UserId));
-                 //}
-                 //catch
-                 //{
-                 //    // ignored
-                 //}
+                 }
+                 catch
+                 {
+                     // ignored
+                 }
              }
              
              return new ObjectResult(result);

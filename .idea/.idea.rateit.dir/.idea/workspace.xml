@@ -11,7 +11,7 @@
   <component name="ChangeListManager">
     <list default="true" id="49107086-9c8a-4122-a943-47b80d1fc3b6" name="Changes" comment="">
       <change afterPath="$USER_HOME$/WebstormProjects/untitled/.idea/untitled.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Helpers/ErrorHandlingFilter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Helpers/ErrorHandlingFilter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Products/AddProductRequestModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Products/AddProductRequestModel.cs" afterDir="false" />
       <change beforePath="$USER_HOME$/eparafia/Eparafia" beforeDir="false" afterPath="$USER_HOME$/eparafia/Eparafia" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -51,6 +51,7 @@
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="nodejs_package_manager_path" value="npm" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RunManager" selected=".NET Launch Settings Profile.rateit: RateitProduction">

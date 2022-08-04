@@ -147,8 +147,14 @@ public class UserController : ControllerBase
             }
             case SettingsMode.Avatar:
             {
-                await System.IO.File.WriteAllTextAsync($@"/var/www/html/avatars_rateit", request.Value.ToString());
+                await System.IO.File.WriteAllTextAsync($@"/var/www/html/avatars_rateit/{request.Id}", request.Value.ToString());
                 await _sqlManager.Execute($"UPDATE users.users SET haveAvatar = true WHERE id = {request.Id};");
+
+                break;
+            }
+            case SettingsMode.DeleteAvatar:
+            {
+                await _sqlManager.Execute($"UPDATE users.users SET haveAvatar = false WHERE id = {request.Id};");
 
                 break;
             }
