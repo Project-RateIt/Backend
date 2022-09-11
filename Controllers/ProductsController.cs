@@ -275,8 +275,19 @@ public class ProductsController : ControllerBase
             string producer = content["products"][0]["category"];
             string category = content["products"][0]["brand"];
             string ean = request.Ean;
-            
 
+            int id = 0;
+            
+            while (true)
+            {
+                Random rand = new Random();
+                id = rand.Next(10000000, 99999999);          
+                if ((!await _sqlManager.IsValueExist($"SELECT * FROM products.products WHERE id = {id};")) && (!await _sqlManager.IsValueExist($"SELECT * FROM products.orders WHERE id = {id};")))
+                    break;
+            }
+
+            await _sqlManager.Execute(
+                $"INSERT INTO products.orders VALUES ('{ean}', {request.UserId}, '{name}', {id}, '{image}', '{producer}', '{category}')");
 
             return new ObjectResult(new Product(0.ToString(), name, 0, 0, false, false, 0, image, category, ean, producer));
         }

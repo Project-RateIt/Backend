@@ -13,6 +13,9 @@
       <change afterPath="$PROJECT_DIR$/../ideu/Interfaces/IUserService.cs" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/../ideu/Models/UserModels/StudentContext.cs" afterDir="false" />
       <change afterPath="$USER_HOME$/WebstormProjects/untitled/.idea/untitled.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Controllers/AdminController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Controllers/AdminController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Controllers/ExampleController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Controllers/ExampleController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Controllers/ProductsController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Controllers/ProductsController.cs" afterDir="false" />
       <change beforePath="$USER_HOME$/eparafia/Eparafia" beforeDir="false" afterPath="$USER_HOME$/eparafia/Eparafia" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
