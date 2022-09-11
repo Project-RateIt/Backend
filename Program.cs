@@ -15,7 +15,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<ISqlManager, SqlManager>();
+builder.Services.AddSingleton<ISqlManager, SqlManager>();
 builder.Services.AddSingleton<IGetObject, GetObject>();
 builder.Services.AddSingleton<IEmailManager, EmailManager>();
 builder.Services.AddSingleton<ITokenManager, TokenManager>();
