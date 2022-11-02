@@ -1,204 +1,41 @@
-using BCrypt.Net;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using rateit.Helpers;
-using rateit.Interfaces;
-using rateit.User;
+using rateit.Service.UserService;
 
 namespace rateit.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Authorize]
+[Route("/api/user")]
 public class UserController : ControllerBase
 {
-    private readonly ISqlManager _sqlManager;
-    private readonly IGetObject _getObject;
-    private readonly IEmailManager _emailManager;
-    private readonly ITokenManager _tokenVerification;
+    private readonly IUserService _userService;
+    public UserController(IUserService userService)
+    {
+        _userService = userService;
+    }
+    [HttpPost("register")]
+    [AllowAnonymous]
+    public Task<IActionResult> Register(string name, string surname, string email, string password) => _userService.Register(name, surname, email, password, new CancellationToken());
 
-    private const string BaseUrl = "/user";
+    [HttpPost("login")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Login(string email, string password) => await _userService.Login(email, password, new CancellationToken());
     
-    public UserController(ISqlManager sqlManager, IGetObject getObject, 
-        IEmailManager emailManager, ITokenManager tokenVerification)
-    {
-        _sqlManager = sqlManager;
-        _getObject = getObject;
-        _emailManager = emailManager;
-        _tokenVerification = tokenVerification;
-    }
+    [HttpPost($"resetPassword")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ResetPassword(string email) => await _userService.ResetPassword(email, new CancellationToken());
     
-    [HttpPost($"{BaseUrl}/register")]
-    public async Task<IActionResult> Register(UserRegisterRequestModel request)
-    {
-        int id;         
-        while (true)
-        {
-            Random rand = new Random();
-            id = rand.Next(10000000, 99999999);          
-            if (!await _sqlManager.IsValueExist($"SELECT * FROM users.users WHERE id = {id};"))
-                break;
-        }
-
-        if (await _sqlManager.IsValueExist($"SELECT * FROM users.users WHERE email = '{request.Email}';"))
-            return StatusCode(409, "EmailIsExist");
-        
-        await _sqlManager.Execute($"INSERT INTO users.users VALUES({id}, '{request.Name}', '{request.Surname}', '{request.Email}',false, '{BCrypt.Net.BCrypt.HashPassword(request.Password, SaltRevision.Revision2Y)}', '', '');");
-        await _sqlManager.Execute($"CREATE TABLE user_details.last_view_products_{id} (productid int, date date);");
-        await _sqlManager.Execute($"CREATE TABLE user_details.rated_products_{id} (productid int, rate int);");
-        await _sqlManager.Execute($"CREATE TABLE user_details.my_product_{id} (productid int, note varchar);");
-        
-        Models.User user;
-        
-        try 
-        {
-            user = await _getObject.GetUser(id);
-        }
-        catch (Exception)
-        {
-            return StatusCode(409, "UnexpectedException");
-        }
-        
-        //await _emailManager.SendEmailActivate(user.Email);
-        //TODO send mail email and verification
-
-        return new ObjectResult(user);
-    }
+    [HttpPost($"setNewPassword")]
+    [AllowAnonymous]
+    public async Task<IActionResult> SetNewPassword(string resetPassKey, string newPassword) => await _userService.SetNewPassword(resetPassKey, newPassword, new CancellationToken());
     
-    [HttpPost($"{BaseUrl}/login")]
-    public async Task<IActionResult> Login(LoginUserRequestModel request)
-    {
-        Models.User user;
-
-        if (await _sqlManager.IsValueExist($"SELECT id FROM users.users WHERE email = '{request.Email}';"))
-        {
-            var data = (await _sqlManager.Reader($"SELECT id, password, isactivated FROM users.users WHERE email = '{request.Email}';"))[0];
-
-            if (!data["isactivated"])
-            {
-                return StatusCode(409, "UserIsNotActive");
-            }
-            if (BCrypt.Net.BCrypt.Verify(request.Password, data["password"]))
-            {
-                user = await _getObject.GetUser(data["id"]);
-            }
-            else
-            {
-                return StatusCode(409, "BadPassword");
-            }
-        }
-        else
-        {
-            return StatusCode(409, "UserIsNotExist");
-        }
-        
-
-        string newToken = await _tokenVerification.GenerateToken(user.Id);
-
-        bool isAdmin = await _sqlManager.IsValueExist($"SELECT * FROM users.admin WHERE id = {user.Id};");
-        
-        return new ObjectResult(new LoginUserResponseModel(user, newToken));
-    }
-    [HttpPost($"{BaseUrl}/isUserExist")]
-    public async Task<IActionResult> IsUserExist(IsUserExistRequestModel request)
-    {
-        if (!await _tokenVerification.UserVerification(request.Token, UserType.User))
-        {
-            return StatusCode(409, "BadAccessToken");
-        }
-        
-        Models.User user;
-        try
-        {
-            user = await _getObject.GetUser(request.Id);
-        }
-        catch (Exception)
-        {
-            return StatusCode(409, "UserIsNotExist");
-        }
-
-        return new ObjectResult(user);
-    }
-    [HttpPost($"{BaseUrl}/settings")]
-    public async Task<IActionResult> SetSettings(SettingsRequestModel request)
-    {
-        
-        if (!await _tokenVerification.UserVerification(request.Token, UserType.User))
-        {
-            return StatusCode(409, "BadAccessToken");
-        }
-        if (!await _sqlManager.IsValueExist($"SELECT id FROM users.users WHERE id = {request.Id}"))
-            return StatusCode(409, "UserIsNotExist");
-
-        switch (request.Mode)
-        {
-            case SettingsMode.Name:
-            {
-                await _sqlManager.Execute($"UPDATE users.users SET name = '{request.Value}' WHERE id = {request.Id};");
-                break;
-            }
-            case SettingsMode.Surname:
-            {
-                await _sqlManager.Execute($"UPDATE users.users SET surname = '{request.Value}' WHERE id = {request.Id};");
-                break;
-            }
-            case SettingsMode.Email:
-            {
-                await _sqlManager.Execute($"UPDATE users.users SET email = '{request.Value}' WHERE id = {request.Id};");
-                break;
-            }
-            case SettingsMode.Avatar:
-            {
-                await System.IO.File.WriteAllTextAsync($@"/var/www/html/avatars_rateit/{request.Id}", request.Value.ToString());
-                await _sqlManager.Execute($"UPDATE users.users SET haveAvatar = true WHERE id = {request.Id};");
-
-                break;
-            }
-            case SettingsMode.DeleteAvatar:
-            {
-                await _sqlManager.Execute($"UPDATE users.users SET haveAvatar = false WHERE id = {request.Id};");
-
-                break;
-            }
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-
-        return Ok();
-    }
-
-    [HttpPost($"{BaseUrl}/resetPassword")]
-    public async Task<IActionResult> ResetPassword(ResetPasswordRequestModel request)
-    {
-        if (await _sqlManager.IsValueExist($"SELECT * FROM users.users WHERE email = '{request.Email}';"))
-        {
-            Random random = new Random();
-        
-            string chars = "1234567890qwertyuiopasdfgthjklQWERTYUIOPASDFGHJKLZXCVBNMzxcvbnm";
-            string key = new string(Enumerable.Repeat(chars, 10)
-                .Select(s => s[random.Next(s.Length)]).ToArray());
-            await _sqlManager.Execute($"UPDATE users.users SET resetpasskey = '{key}' WHERE email = '{request.Email}';");
-
-            await _emailManager.SendEmailActivate(request.Email);
-        }
-        else
-        {
-            return StatusCode(409, "EmailIsNotExist");
-        }
-        
-        return Ok();
-    }    
+    [HttpPut($"update")]
+    public async Task<IActionResult> Update(DataAccess.Entities.User user) => await _userService.UpdateUser(user, Guid.Parse(HttpContext.User.Claims.First(c => c.Type == "Id").Value.ToString()), new CancellationToken());        
     
-    [HttpGet($"{BaseUrl}/setNewPassword")]
-    public async Task<IActionResult> SetNewPassword(SetNewPasswordRequestModel request)
-    {
-        if (await _sqlManager.IsValueExist($"SELECT * FROM users.users WHERE resetpasskey = '{request.ResetPassKey}';"))
-        {
-            await _sqlManager.Execute($"UPDATE users.users SET password = '{BCrypt.Net.BCrypt.HashPassword(request.NewPassword, SaltRevision.Revision2Y)}' WHERE resetpasskey = '{request.ResetPassKey}';");
-        }
-        else
-        {
-            return StatusCode(409, "UserIsNotExist");
-        }
-        
-        return Ok();
-    }
+    [HttpPut($"changePhoto")]
+    public async Task<IActionResult> ChangePhoto(string base64) => await _userService.ChangePhoto(Guid.Parse(HttpContext.User.Claims.First(c => c.Type == "Id").Value.ToString()), base64, new CancellationToken());    
+    
+    [HttpDelete($"remove")]
+    public async Task<IActionResult> RemoveAccount() => await _userService.RemoveAccount(Guid.Parse(HttpContext.User.Claims.First(c => c.Type == "Id").Value.ToString()), new CancellationToken());
 }
