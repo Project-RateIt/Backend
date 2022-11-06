@@ -22,6 +22,15 @@ public class UserController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> Login(string email, string password) => await _userService.Login(email, password, new CancellationToken());
     
+    //Refresh token endpoint
+    [HttpPost("refresh")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Refresh(Guid id) => await _userService.RefreshToken(id, new CancellationToken());
+    
+    [HttpPut("activate")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Activate(string email, string code) => await _userService.ActivateUser(code, email, new CancellationToken());
+    
     [HttpPost($"resetPassword")]
     [AllowAnonymous]
     public async Task<IActionResult> ResetPassword(string email) => await _userService.ResetPassword(email, new CancellationToken());

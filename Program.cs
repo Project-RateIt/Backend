@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using rateit;
 using rateit.DataAccess.Abstract;
 using rateit.DataAccess.DbContexts;
 using rateit.Jwt;
@@ -14,6 +15,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddControllers();
+
+builder.Services.AddMvc(options =>
+{
+    options.Filters.Add(new ErrorHandlingFilter());
+});
 
 builder.WebHost.ConfigureKestrel(options =>
 {
@@ -51,7 +57,11 @@ builder.Services.AddSwaggerGen(c => {
 
 Console.WriteLine(builder.Configuration["ConnectionString"]!);
 
-builder.Services.AddDbContext<UserContext>(options => options.UseNpgsql(builder.Configuration["ConnectionString"]!));
+builder.Services.AddDbContext<UserContext>(options =>
+{
+    options.UseNpgsql(builder.Configuration["ConnectionString"]!);
+    options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+});
 
 builder.Services.AddScoped<DbContext, UserContext>();
 
@@ -106,7 +116,6 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-
 
 app.MapControllers();
 app.MapGet("/", () => "Hello World!");

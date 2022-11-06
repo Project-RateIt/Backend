@@ -20,9 +20,8 @@
       "launchBrowser": false,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "ConnectionString":  "Host=192.168.1.11;Username=postgres;Password=!Malinka@pass;Database=rateit"
-      },
-      "applicationUrl": "localhost:5001;localhost:5000"
+        "ConnectionString":  "Host=localhost;Username=postgres;Password=!Malinka@pass;Database=rateit"
+      }
     },
     "RateitProduction": {
       "commandName": "Project",
