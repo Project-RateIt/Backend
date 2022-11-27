@@ -2,7 +2,6 @@
 *.dll
 *.config
 .idea/.idea.rateit.dir/.idea/.name
-Backend/
 .idea/
 Avatars/
 *.zip
@@ -10,7 +9,6 @@ Avatars/
 *.exe
 *.pdb
 *.user
-*.cs
 *.cache
 *.CopyComplete
 *.txt
