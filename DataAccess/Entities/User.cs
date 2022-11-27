@@ -8,10 +8,10 @@ public sealed class User : Entity
     public string? Email { get; set; }
     public string? PasswordHash { get; set; }
     public string? ResetPassKey { get; set; }
-    public int AddedProduct { get; set; }
+    public int? AddedProduct { get; set; }
     public bool IsActive { get; set; }
     public bool HaveAvatar { get; set; }
-    public ActivateCode ActivateCode { get; set; }
+    public ActivateCode? ActivateCode { get; set; }
     public AccountType AccountType { get; set; }
     public ICollection<NotedProduct>? NotedProducts { get; set; }
     public ICollection<RatedProduct>? RatedProducts { get; set; }

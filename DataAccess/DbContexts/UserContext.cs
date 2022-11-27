@@ -9,6 +9,7 @@ using rateit.DataAccess.Repository.ProductRepository;
 using rateit.DataAccess.Repository.RatedProductRepository;
 using rateit.DataAccess.Repository.UserRepository;
 using rateit.DataAccess.Repository.ViewedProductRepository;
+using rateit.Services;
 
 namespace rateit.DataAccess.DbContexts;
 

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using rateit.DataAccess.Abstract;
 using rateit.DataAccess.Entities;
 using rateit.Exceptions;
+using rateit.Services;
 
 namespace rateit.Actions.Product.Command;
 

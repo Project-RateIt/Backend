@@ -23,7 +23,7 @@ public class UserRepository : BaseRepository<Entities.User>, IUserRepository
             Name = c.Name,
             Surname = c.Surname,
             AccountType = c.AccountType,
-            AddedProduct = c.AddedProduct,
+            AddedProduct = -+c.AddedProduct,
             HaveAvatar = c.HaveAvatar,
             IsActive = c.IsActive,
             PasswordHash = c.PasswordHash,

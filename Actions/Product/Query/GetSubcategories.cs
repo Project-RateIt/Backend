@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using rateit.DataAccess.Abstract;
 using rateit.DataAccess.Entities;
 using rateit.DTOs;
+using rateit.Services;
 
 namespace rateit.Actions.Product.Query;
 

@@ -3,11 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using rateit.Actions.Product.Command;
 using rateit.Actions.Product.Query;
-using rateit.Actions.User.Query;
-using rateit.DataAccess.Entities;
-using rateit.Jwt;
 using rateit.Middlewares.Models;
-using rateit.Service.ProductService;
+using rateit.Services;
 
 namespace rateit.Controllers;
 
@@ -17,11 +14,12 @@ namespace rateit.Controllers;
 public class ProductsController : ControllerBase
 {
     private readonly IMediator _mediator;
-    public ProductsController(IMediator mediator)
+    private readonly Guid _currentUserId;
+    public ProductsController(IMediator mediator, IUserProvider userProvider)
     {
         _mediator = mediator;
+        _currentUserId = userProvider.Id;
     }
-
     
     [HttpGet($"search")]
     public async Task<IActionResult> Search(string query, int page)
@@ -33,35 +31,35 @@ public class ProductsController : ControllerBase
     [HttpPost($"rate")]
     public async Task<IActionResult> Rate(Guid productId, int rate)
     {
-        var result = await _mediator.Send(new Rate.Command(productId, Guid.Parse(HttpContext.User.Claims.First(c => c.Type == "Id").Value.ToString()), rate));
+        var result = await _mediator.Send(new Rate.Command(productId, _currentUserId, rate));
         return new ObjectResult(ApiResponse.Success(200, result));
     }
 
     [HttpDelete($"unrate")]
     public async Task<IActionResult> Unrate(Guid productId)
     {
-        var result = await _mediator.Send(new Unrate.Command(productId, Guid.Parse(HttpContext.User.Claims.First(c => c.Type == "Id").Value.ToString())));
+        var result = await _mediator.Send(new Unrate.Command(productId, _currentUserId));
         return new ObjectResult(ApiResponse.Success(200, result));
     }
 
     [HttpPost($"note")]
     public async Task<IActionResult> Note(Guid productId, string note)
     {
-        var result = await _mediator.Send(new Note.Command(productId, Guid.Parse(HttpContext.User.Claims.First(c => c.Type == "Id").Value.ToString()), note));
+        var result = await _mediator.Send(new Note.Command(productId, _currentUserId, note));
         return new ObjectResult(ApiResponse.Success(200, result));
     }
 
     [HttpDelete($"removeNote")]
     public async Task<IActionResult> RemoveNote(Guid productId)
     {
-        var result = await _mediator.Send(new RemoveNote.Command(productId, Guid.Parse(HttpContext.User.Claims.First(c => c.Type == "Id").Value.ToString())));
+        var result = await _mediator.Send(new RemoveNote.Command(productId, _currentUserId));
         return new ObjectResult(ApiResponse.Success(200, result));
     }
 
     [HttpPost($"viewProduct")]
     public async Task<IActionResult> ViewProduct(Guid productId)
     {
-        var result = await _mediator.Send(new ViewProduct.Command(productId, Guid.Parse(HttpContext.User.Claims.First(c => c.Type == "Id").Value.ToString())));
+        var result = await _mediator.Send(new ViewProduct.Command(productId, _currentUserId));
         return new ObjectResult(ApiResponse.Success(200, result));
     }
 
@@ -75,21 +73,21 @@ public class ProductsController : ControllerBase
     [HttpGet($"getRatedProduct")]
     public async Task<IActionResult> GetRatedProduct(int page)
     {
-        var result = await _mediator.Send(new GetRatedProduct.Query(Guid.Parse(HttpContext.User.Claims.First(c => c.Type == "Id").Value.ToString()), page));
+        var result = await _mediator.Send(new GetRatedProduct.Query(_currentUserId, page));
         return new ObjectResult(ApiResponse.Success(200, result));
     }
 
     [HttpGet($"getNotedProduct")]
     public async Task<IActionResult> GetNotedProduct(int page)
     {
-        var result = await _mediator.Send(new GetNotedProduct.Query(Guid.Parse(HttpContext.User.Claims.First(c => c.Type == "Id").Value.ToString()), page));
+        var result = await _mediator.Send(new GetNotedProduct.Query(_currentUserId, page));
         return new ObjectResult(ApiResponse.Success(200, result));
     }
 
     [HttpGet($"getViewedProduct")]
     public async Task<IActionResult> GetViewedProduct(int page)
     {
-        var result = await _mediator.Send(new GetViewedProduct.Query(Guid.Parse(HttpContext.User.Claims.First(c => c.Type == "Id").Value.ToString()), page));
+        var result = await _mediator.Send(new GetViewedProduct.Query(_currentUserId, page));
         return new ObjectResult(ApiResponse.Success(200, result));
     }
 

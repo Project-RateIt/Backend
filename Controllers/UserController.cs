@@ -4,22 +4,24 @@ using Microsoft.AspNetCore.Mvc;
 using rateit.Actions.User.Command;
 using rateit.Actions.User.Query;
 using rateit.Middlewares.Models;
+using rateit.Services;
+using rateit.Services.UserProvider;
 
 namespace rateit.Controllers;
 
 [ApiController]
-[Authorize]
 [Produces("application/json")]
 [Route("/api/user")]
 public class UserController : ControllerBase
 {
-    private IMediator _mediator;
-    public UserController(IMediator mediator)
+    private readonly IMediator _mediator;
+    private readonly Guid _currentUserId;
+    public UserController(IMediator mediator, IUserProvider userProvider)
     {
         _mediator = mediator;
+        _currentUserId = userProvider.Id;
     }
     [HttpPost("register")]
-    [AllowAnonymous]
     public async Task<IActionResult> Register(string name, string surname, string email, string password)
     {
         var result = await _mediator.Send(new Register.Command(email, surname, name, password));
@@ -27,7 +29,6 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("login")]
-    [AllowAnonymous]
     public async Task<IActionResult> Login(string email, string password)
     {
         var result = await _mediator.Send(new Login.Query(email, password));
@@ -40,7 +41,6 @@ public class UserController : ControllerBase
     // public async Task<IActionResult> Refresh(Guid id) => await _userService.RefreshToken(id, new CancellationToken());
 
     [HttpPut("activate")]
-    [AllowAnonymous]
     public async Task<IActionResult> Activate(string email, string code)
     {
         var result = await _mediator.Send(new ActivateUser.Command(email, code));
@@ -48,7 +48,6 @@ public class UserController : ControllerBase
     }
 
     [HttpPost($"resetPassword")]
-    [AllowAnonymous]
     public async Task<IActionResult> ResetPassword(string email)
     {
         var result = await _mediator.Send(new ResetPassword.Command(email));
@@ -57,13 +56,13 @@ public class UserController : ControllerBase
     
 
     [HttpPost($"setNewPassword")]
-    [AllowAnonymous]
     public async Task<IActionResult> SetNewPassword(string resetPassKey, string newPassword)
     {
         var result = await _mediator.Send(new SetNewPassword.Command(resetPassKey, newPassword));
         return new ObjectResult(ApiResponse.Success(200, result));
     }
-
+    
+    [Authorize]
     [HttpPut($"update")]
     public async Task<IActionResult> Update(DataAccess.Entities.User user)
     {
@@ -71,6 +70,7 @@ public class UserController : ControllerBase
         return new ObjectResult(ApiResponse.Success(200, result));
     }
 
+    [Authorize]
     [HttpPut($"changePhoto")]
     public async Task<IActionResult> ChangePhoto(string base64)
     {
@@ -79,10 +79,11 @@ public class UserController : ControllerBase
         
     }
 
+    [Authorize]
     [HttpDelete($"remove")]
     public async Task<IActionResult> RemoveAccount()
     {
-        var result = await _mediator.Send(new RemoveAccount.Command(Guid.Parse(HttpContext.User.Claims.First(c => c.Type == "Id").Value.ToString())));
+        var result = await _mediator.Send(new RemoveAccount.Command(_currentUserId));
         return new ObjectResult(ApiResponse.Success(200, result));
     }
 }

@@ -12,12 +12,10 @@ public class Product : Entity
 
     public Guid SubcategoryId { get; set; }
     public Subcategory? Subcategory { get; set; }
-    
-    public Guid CategoryId { get; set; }
-    public Category? Category { get; set; }
-    
     public int RateSum { get; set; }
     public int RateCount { get; set; }
+    public Guid CategoryId { get; set; }
+    public Category? Category { get; set; }
     public int Sponsor { get; set; }
     
     public ICollection<NotedProduct>? NotedProducts { get; set; }

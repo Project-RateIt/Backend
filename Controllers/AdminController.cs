@@ -5,7 +5,7 @@ using rateit.Actions.Admin.Command;
 using rateit.DataAccess.Entities;
 using rateit.Jwt;
 using rateit.Middlewares.Models;
-using rateit.Service.ProductService;
+using rateit.Services;
 
 namespace rateit.Controllers;
 
@@ -15,10 +15,11 @@ namespace rateit.Controllers;
 public class AdminController : ControllerBase
 {
     private readonly IMediator _mediator;
-
-    public AdminController(IMediator mediator)
+    private readonly Guid _currentUserId;
+    public AdminController(IMediator mediator, IUserProvider userProvider)
     {
         _mediator = mediator;
+        _currentUserId = userProvider.Id;
     }
 
     [HttpPost("addProduct")]

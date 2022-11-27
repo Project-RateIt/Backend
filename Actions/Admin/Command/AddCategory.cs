@@ -2,6 +2,7 @@ using FluentValidation;
 using MediatR;
 using rateit.DataAccess.Abstract;
 using rateit.DataAccess.Entities;
+using rateit.Services;
 
 namespace rateit.Actions.Admin.Command;
 

@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 using rateit.Exceptions;
 using rateit.Middlewares.Models;
 
-namespace rateit.Middlewares;
+namespace rateit.Middlewaress;
 
 public class ExceptionHandler
 {

@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using rateit.DataAccess.Abstract;
 using rateit.DTOs;
+using rateit.Services;
 
 namespace rateit.Actions.Product.Query;
 

@@ -1,7 +1,7 @@
 using MediatR;
 using rateit.DataAccess.Abstract;
 using rateit.Exceptions;
-using rateit.Helpers;
+using rateit.Services;
 
 namespace rateit.Actions.Product.Query;
 

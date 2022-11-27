@@ -3,6 +3,7 @@ using MediatR;
 using rateit.DataAccess.Abstract;
 using rateit.DataAccess.Entities;
 using rateit.Exceptions;
+using rateit.Services;
 
 namespace rateit.Actions.Admin.Command;
 

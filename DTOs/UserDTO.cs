@@ -8,7 +8,7 @@ public class UserDTO
     public string? Name { get; set; }
     public string? Surname { get; set; }
     public string? Email { get; set; }
-    public int AddedProduct { get; set; }
+    public int? AddedProduct { get; set; }
     public bool HaveAvatar { get; set; }
     public bool IsActive { get; set; }
     public string PasswordHash { get; set; }

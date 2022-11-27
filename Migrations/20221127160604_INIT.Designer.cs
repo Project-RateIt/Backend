@@ -12,8 +12,8 @@ using rateit.DataAccess.DbContexts;
 namespace rateit.Migrations
 {
     [DbContext(typeof(UserContext))]
-    [Migration("20221031135029_test5")]
-    partial class test5
+    [Migration("20221127160604_INIT")]
+    partial class INIT
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,6 +23,29 @@ namespace rateit.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("rateit.DataAccess.Entities.ActivateCode", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("ActivateCodes", (string)null);
+                });
 
             modelBuilder.Entity("rateit.DataAccess.Entities.Category", b =>
                 {
@@ -42,6 +65,12 @@ namespace rateit.Migrations
 
             modelBuilder.Entity("rateit.DataAccess.Entities.NotedProduct", b =>
                 {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
@@ -49,19 +78,11 @@ namespace rateit.Migrations
                     b.Property<string>("Note")
                         .HasColumnType("text");
 
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
+                    b.HasKey("UserId", "ProductId");
 
                     b.HasIndex("Id");
 
                     b.HasIndex("ProductId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("NotedProducts", (string)null);
                 });
@@ -112,6 +133,9 @@ namespace rateit.Migrations
 
             modelBuilder.Entity("rateit.DataAccess.Entities.RatedProduct", b =>
                 {
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
@@ -119,17 +143,14 @@ namespace rateit.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uuid");
-
                     b.Property<int>("Rate")
                         .HasColumnType("integer");
 
-                    b.HasKey("UserId");
+                    b.HasKey("ProductId", "UserId");
 
                     b.HasIndex("Id");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("RatedProducts", (string)null);
                 });
@@ -197,28 +218,35 @@ namespace rateit.Migrations
 
             modelBuilder.Entity("rateit.DataAccess.Entities.ViewedProduct", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("UserId")
+                    b.Property<string>("Date")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("Id");
+                    b.HasKey("UserId", "ProductId");
 
                     b.HasIndex("ProductId");
 
-                    b.HasIndex("UserId");
-
                     b.ToTable("ViewedProducts", (string)null);
+                });
+
+            modelBuilder.Entity("rateit.DataAccess.Entities.ActivateCode", b =>
+                {
+                    b.HasOne("rateit.DataAccess.Entities.User", "User")
+                        .WithOne("ActivateCode")
+                        .HasForeignKey("rateit.DataAccess.Entities.ActivateCode", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("rateit.DataAccess.Entities.NotedProduct", b =>
@@ -331,6 +359,9 @@ namespace rateit.Migrations
 
             modelBuilder.Entity("rateit.DataAccess.Entities.User", b =>
                 {
+                    b.Navigation("ActivateCode")
+                        .IsRequired();
+
                     b.Navigation("NotedProducts");
 
                     b.Navigation("RatedProducts");

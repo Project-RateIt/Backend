@@ -1,9 +1,8 @@
 using FluentValidation;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
 using rateit.DataAccess.Abstract;
 using rateit.Exceptions;
-using rateit.Helpers;
+using rateit.Services;
 
 namespace rateit.Actions.User.Command;
 

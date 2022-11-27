@@ -13,12 +13,13 @@ public class JwtAuth : IJwtAuth
     {
         _configuration = configuration;
     }
-    public Task<string> GenerateJwt(Guid id, string role)
+
+    public Task<GeneratedToken> GenerateJwt(Guid id, string role)
     {
         byte[] key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]!);
-        
+
         //tu add claims
-        
+
         SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(new[]
@@ -35,8 +36,10 @@ public class JwtAuth : IJwtAuth
         };
         JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
         SecurityToken? token = tokenHandler.CreateToken(tokenDescriptor);
-        return Task.FromResult(tokenHandler.WriteToken(token));    }
-    
+        return Task.FromResult(new GeneratedToken(tokenHandler.WriteToken(token)));
+    }
+
+
 
     public Guid GetCurrentUser(HttpContext context)
     {

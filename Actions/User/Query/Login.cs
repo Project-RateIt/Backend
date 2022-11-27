@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using rateit.DataAccess.Abstract;
 using rateit.Exceptions;
 using rateit.Jwt;
+using rateit.Services;
 
 namespace rateit.Actions.User.Query;
 

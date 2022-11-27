@@ -5,16 +5,15 @@ using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using rateit;
 using rateit.DataAccess.Abstract;
 using rateit.DataAccess.DbContexts;
 using rateit.Jwt;
 using rateit.Middlewares;
-using rateit.Service.ProductService;
-using rateit.Service.UserService;
+using rateit.Middlewaress;
+using rateit.Services;
+using rateit.Services.UserProvider;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -79,12 +78,10 @@ builder.Services.AddDbContext<UserContext>(options =>
 });
 
 builder.Services.AddScoped<DbContext, UserContext>();
-
 builder.Services.AddScoped<IUnitOfWork, UserContext>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IProductService, ProductService>();
-
 builder.Services.AddScoped<IJwtAuth, JwtAuth>();
+builder.Services.AddScoped<IUserProvider, UserProvider>();
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -138,10 +135,10 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseMiddleware<ExceptionHandler>();
+app.UseMiddleware<UserProviderMiddleware>();
 
 
 app.MapControllers();
 app.MapGet("/", () => "Hello World!");
 
 app.Run();
-
