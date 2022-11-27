@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using rateit.Actions.User.Command;
 using rateit.Actions.User.Query;
 using rateit.Middlewares.Models;
-using rateit.Service.UserService;
 
 namespace rateit.Controllers;
 

@@ -10,11 +10,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="49107086-9c8a-4122-a943-47b80d1fc3b6" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.rateit.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.rateit.dir/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Controllers/ProductsController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Controllers/ProductsController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Controllers/UserController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Controllers/UserController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rateit.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/rateit.csproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../eparafia/Eparafia" beforeDir="false" afterPath="$PROJECT_DIR$/../eparafia/Eparafia" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../first-app-rn/first-app" beforeDir="false" afterPath="$PROJECT_DIR$/../first-app-rn/first-app" afterDir="false" />
     </list>
