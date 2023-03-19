@@ -9,8 +9,7 @@
     "rateit": {
       "commandName": "Project",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "ConnectionString": "Host=localhost;Username=postgres;Password=!Malinka@pass;Database=rateit"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
     "RateitProduction": {

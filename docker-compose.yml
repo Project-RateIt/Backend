@@ -2,6 +2,8 @@ version: '3.4'
 
 services:
   rateit:
+    ports:
+      - 5010:5000
     image: ${DOCKER_REGISTRY-}rateit
     build:
       context: .

@@ -73,7 +73,7 @@ Console.WriteLine(builder.Configuration["ConnectionString"]!);
 
 builder.Services.AddDbContext<UserContext>(options =>
 {
-    options.UseNpgsql(builder.Configuration["ConnectionString"]!);
+    options.UseMySql(builder.Configuration["ConnectionString"]!, ServerVersion.AutoDetect(builder.Configuration["ConnectionString"]!));
     options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 });
 
@@ -115,7 +115,7 @@ builder.Services.AddCors(options =>
 });
 
 
-builder.Services.AddMediatR(typeof(Program));
+builder.Services.AddMediatR(typeof(Program).Assembly);
 
 
 var app = builder.Build();
