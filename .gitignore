@@ -22,5 +22,6 @@ bin/
 /bin
 /obj
 obj/
+.vs
 
 SqlConnection
