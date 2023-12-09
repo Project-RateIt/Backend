@@ -11,7 +11,7 @@ using rateit.DataAccess.DbContexts;
 namespace rateit.Migrations
 {
     [DbContext(typeof(UserContext))]
-    [Migration("20230319185617_init")]
+    [Migration("20231209142549_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
