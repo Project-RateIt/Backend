@@ -50,4 +50,5 @@ public class UserRepository : BaseRepository<Entities.User>, IUserRepository
     }
 
     public Task<Entities.User> GetByResetPasswordKey(string key, CancellationToken cancellationToken = default) => _entities.FirstOrDefaultAsync(c => c.ResetPassKey == key, cancellationToken)!;
+    public Task<User?> GetByExternalToken(string token, CancellationToken cancellationToken) => _entities.FirstOrDefaultAsync(c => c.PasswordHash == token && c.IsExternal, cancellationToken)!;
 }

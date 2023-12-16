@@ -31,6 +31,7 @@ public static class SetNewPassword
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
         
             _unitOfWork.Users.Update(user);
+            await _unitOfWork.SaveChangesAsync(cancellationToken:cancellationToken);
             return Unit.Value;
         }
 

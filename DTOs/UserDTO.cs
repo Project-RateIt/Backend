@@ -13,8 +13,8 @@ public class UserDTO
     public bool IsActive { get; set; }
     public string PasswordHash { get; set; }
     public AccountType AccountType { get; set; }
+    public string ResetPassKey { get; set; }
     public ActivateCode ActivateCode { get; set; }
-
     public ICollection<NotedProductDTO> NotedProducts { get; set; }
     public ICollection<RatedProductDTO> RatedProducts { get; set; }
     public ICollection<ViewedProductDTO> ViewedProducts { get; set; }

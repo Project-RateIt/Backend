@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aktywacja hasła</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            color: #00aa00; /* Jasnozielony kolor */
+        }
+
+        p {
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            background-color: #00aa00; /* Jasnozielony kolor tła */
+            color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #fff;
+        }
+
+        button {
+            background-color: #00aa00; /* Jasnozielony kolor przycisku */
+            color: #fff;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #007700; /* Ciemniejszy odcień zielonego przy najechaniu kursorem */
+        }
+    </style>
+</head>
+<body>
+
+<h1>Witaj, {USERNAME}!</h1>
+<p>Aby aktywować swoje hasło, kliknij poniższy przycisk:</p>
+<h2>{CODE}</h2>
+<a href="http://91.227.2.183:90/api/user/activate?email={EMAIL}&code={CODE}">
+    <button onclick="activateAccount()">Aktywuj konto</button>
+</a>
+
+</body>
+</html>

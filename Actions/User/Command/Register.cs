@@ -4,6 +4,7 @@ using rateit.DataAccess.Abstract;
 using rateit.DataAccess.Entities;
 using rateit.Exceptions;
 using rateit.Services;
+using rateit.Services.EmailService;
 
 namespace rateit.Actions.User.Command;
 
@@ -15,10 +16,12 @@ public static class Register
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly int _pageSize;
+        private readonly IEmailService _emailService;
 
-        public Handler(IUnitOfWork unitOfWork, IConfiguration configuration)
+        public Handler(IUnitOfWork unitOfWork, IConfiguration configuration, IEmailService emailService)
         {
             _unitOfWork = unitOfWork;
+            _emailService = emailService;
             _pageSize = int.Parse(configuration["PageSize"]);
         }
 
@@ -29,7 +32,6 @@ public static class Register
             {
                 throw new InvalidRequestException("User with this email already exists");
             }
-
             DataAccess.Entities.User createdUser = new DataAccess.Entities.User
             {
                 Id = Guid.NewGuid(),
@@ -42,8 +44,9 @@ public static class Register
                 IsActive = false
             };
         
+            
             await _unitOfWork.Users.AddAsync(createdUser, cancellationToken);
-
+            
             Random random = new Random();
         
             string chars = "1234567890QWERTYUIOPASDFGHJKLZXCVBNM";
@@ -59,7 +62,8 @@ public static class Register
             }, cancellationToken);
         
             await _unitOfWork.SaveChangesAsync(cancellationToken);
-        
+            await _emailService.SendActivateEmail(createdUser.Email, createdUser.Name, key);
+
             //TODO Send Email
 
             return Unit.Value;

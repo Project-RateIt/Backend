@@ -11,6 +11,7 @@ public sealed class User : Entity
     public int? AddedProduct { get; set; }
     public bool IsActive { get; set; }
     public bool HaveAvatar { get; set; }
+    public bool IsExternal { get; set; }
     public ActivateCode? ActivateCode { get; set; }
     public AccountType AccountType { get; set; }
     public ICollection<NotedProduct>? NotedProducts { get; set; }

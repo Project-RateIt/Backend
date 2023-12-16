@@ -13,6 +13,7 @@ using rateit.Jwt;
 using rateit.Middlewares;
 using rateit.Middlewaress;
 using rateit.Services;
+using rateit.Services.EmailService;
 using rateit.Services.UserProvider;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -80,6 +81,7 @@ builder.Services.AddDbContext<UserContext>(options =>
 builder.Services.AddScoped<DbContext, UserContext>();
 builder.Services.AddScoped<IUnitOfWork, UserContext>();
 builder.Services.AddScoped<IJwtAuth, JwtAuth>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IUserProvider, UserProvider>();
 
 builder.Services.AddAuthentication(options =>
@@ -121,7 +123,7 @@ builder.Services.AddMediatR(typeof(Program).Assembly);
 var app = builder.Build();
 
 app.UseRouting();
-
+app.UseStaticFiles("/static");
 app.UseCors();
 
 //if (app.Environment.IsDevelopment()){

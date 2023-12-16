@@ -8,11 +8,11 @@ using rateit.Services.EmailService;
 
 namespace rateit.Actions.User.Command;
 
-public static class Register
+public static class ExternalRegister
 {
-    public sealed record Command(string Email, string Surname, string Name, string Password) : IRequest<Unit>;
+    public sealed record ExternalRegisterCommand(string Email, string Surname, string Name, string Token) : IRequest<Unit>;
 
-    public class Handler : IRequestHandler<Command, Unit>
+    public class Handler : IRequestHandler<ExternalRegisterCommand, Unit>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly int _pageSize;
@@ -25,7 +25,7 @@ public static class Register
             _pageSize = int.Parse(configuration["PageSize"]);
         }
 
-        public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(ExternalRegisterCommand request, CancellationToken cancellationToken)
         {
             var user = await _unitOfWork.Users.GetByEmailAsync(request.Email, _pageSize, cancellationToken);
             if (user != null)
@@ -38,38 +38,21 @@ public static class Register
                 Name = request.Name,
                 Surname = request.Surname,
                 Email = request.Email,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                PasswordHash = request.Token,
                 AccountType = AccountType.User,
                 HaveAvatar = false,
-                IsActive = false
+                IsActive = true,
+                IsExternal = true,
             };
         
             
             await _unitOfWork.Users.AddAsync(createdUser, cancellationToken);
             
-            Random random = new Random();
-        
-            string chars = "1234567890QWERTYUIOPASDFGHJKLZXCVBNM";
-            string key = new string(Enumerable.Repeat(chars, 6)
-                .Select(s => s[random.Next(s.Length)]).ToArray());
-
-            await _unitOfWork.ActivateCodes.AddAsync(new ActivateCode
-            {
-                Code = key,
-                UserId = createdUser.Id,
-                Id = Guid.NewGuid(),
-                User = createdUser
-            }, cancellationToken);
-        
             await _unitOfWork.SaveChangesAsync(cancellationToken);
-            await _emailService.SendActivateEmail(createdUser.Email, createdUser.Name, key);
-
-            //TODO Send Email
-
             return Unit.Value;
         }
 
-        public sealed class Validator : AbstractValidator<Command>
+        public sealed class Validator : AbstractValidator<ExternalRegisterCommand>
         {
             public Validator()
             {

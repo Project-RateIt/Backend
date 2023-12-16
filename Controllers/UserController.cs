@@ -5,7 +5,6 @@ using rateit.Actions.User.Command;
 using rateit.Actions.User.Query;
 using rateit.Middlewares.Models;
 using rateit.Services;
-using rateit.Services.UserProvider;
 
 namespace rateit.Controllers;
 
@@ -40,11 +39,11 @@ public class UserController : ControllerBase
     // [AllowAnonymous]
     // public async Task<IActionResult> Refresh(Guid id) => await _userService.RefreshToken(id, new CancellationToken());
 
-    [HttpPut("activate")]
+    [HttpGet("activate")]
     public async Task<IActionResult> Activate(string email, string code)
     {
         var result = await _mediator.Send(new ActivateUser.Command(email, code));
-        return new ObjectResult(ApiResponse.Success(200, result));
+        return RedirectPermanent("https://www.google.com");
     }
 
     [HttpPost($"resetPassword")]
@@ -56,10 +55,10 @@ public class UserController : ControllerBase
     
 
     [HttpPost($"setNewPassword")]
-    public async Task<IActionResult> SetNewPassword(string resetPassKey, string newPassword)
+    public async Task<IActionResult> SetNewPassword([FromForm]string resetPassKey, [FromForm]string newPassword)
     {
         var result = await _mediator.Send(new SetNewPassword.Command(resetPassKey, newPassword));
-        return new ObjectResult(ApiResponse.Success(200, result));
+        return RedirectPermanent("https://www.google.com");
     }
     
     [Authorize]
@@ -84,6 +83,20 @@ public class UserController : ControllerBase
     public async Task<IActionResult> RemoveAccount()
     {
         var result = await _mediator.Send(new RemoveAccount.Command(_currentUserId));
+        return new ObjectResult(ApiResponse.Success(200, result));
+    }
+    
+    [HttpPost("externalLogin")]
+    public async Task<IActionResult> ExternalLogin(ExternalLogin.ExternalLoginCommand externalLoginExternalLoginCommand)
+    {
+        var result = await _mediator.Send(externalLoginExternalLoginCommand);
+        return new ObjectResult(ApiResponse.Success(200, result));
+    }    
+    
+    [HttpPost("externalRegister")]
+    public async Task<IActionResult> ExternalRegister(ExternalRegister.ExternalRegisterCommand externalRegisterExternalRegisterCommand)
+    {
+        var result = await _mediator.Send(externalRegisterExternalRegisterCommand);
         return new ObjectResult(ApiResponse.Success(200, result));
     }
 }

@@ -3,56 +3,45 @@ using MediatR;
 using rateit.DataAccess.Abstract;
 using rateit.DataAccess.Entities;
 using rateit.Exceptions;
+using rateit.Jwt;
 using rateit.Services;
 using rateit.Services.EmailService;
 
 namespace rateit.Actions.User.Command;
 
-public static class ExternalRegister
+public static class ExternalLogin
 {
-    public sealed record Command(string Email, string Surname, string Name, string Token) : IRequest<Unit>;
+    public sealed record ExternalLoginCommand(string Token) : IRequest<GeneratedToken>;
 
-    public class Handler : IRequestHandler<Command, Unit>
+    public class Handler : IRequestHandler<ExternalLoginCommand, GeneratedToken>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly int _pageSize;
         private readonly IEmailService _emailService;
+        private readonly IJwtAuth _jwtAuth;
 
-        public Handler(IUnitOfWork unitOfWork, IConfiguration configuration, IEmailService emailService)
+        public Handler(IUnitOfWork unitOfWork, IConfiguration configuration, IEmailService emailService, IJwtAuth jwtAuth)
         {
             _unitOfWork = unitOfWork;
             _emailService = emailService;
+            _jwtAuth = jwtAuth;
             _pageSize = int.Parse(configuration["PageSize"]);
         }
 
-        public async Task<Unit> Handle(Command request, CancellationToken cancellationToken)
+        public async Task<GeneratedToken> Handle(ExternalLoginCommand request, CancellationToken cancellationToken)
         {
-            var user = await _unitOfWork.Users.GetByEmailAsync(request.Email, _pageSize, cancellationToken);
-            if (user != null)
+            var user = await _unitOfWork.Users.GetByExternalToken(request.Token, cancellationToken);
+            if (user is null)
             {
-                throw new InvalidRequestException("User with this email already exists");
+                throw new BadPassword("User with this token not");
             }
-            DataAccess.Entities.User createdUser = new DataAccess.Entities.User
-            {
-                Id = Guid.NewGuid(),
-                Name = request.Name,
-                Surname = request.Surname,
-                Email = request.Email,
-                PasswordHash = request.Token,
-                AccountType = AccountType.User,
-                HaveAvatar = false,
-                IsActive = true,
-                IsExternal = true,
-            };
-        
-            
-            await _unitOfWork.Users.AddAsync(createdUser, cancellationToken);
-            
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-            return Unit.Value;
+
+            var role = user!.AccountType == AccountType.Admin ? JwtPolicies.Admin : JwtPolicies.User;
+            var jwt = await _jwtAuth.GenerateJwt(user.Id, role);
+            return jwt;
         }
 
-        public sealed class Validator : AbstractValidator<Command>
+        public sealed class Validator : AbstractValidator<ExternalLoginCommand>
         {
             public Validator()
             {

@@ -9,9 +9,9 @@ namespace rateit.Actions.User.Query;
 
 public static class Login
 {
-    public sealed record Query(string Email, string Password) : IRequest<object>;
+    public sealed record Query(string Email, string Password) : IRequest<GeneratedToken>;
 
-    public class Handler : IRequestHandler<Query, object>
+    public class Handler : IRequestHandler<Query, GeneratedToken>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IJwtAuth _jwtAuth;
@@ -24,7 +24,7 @@ public static class Login
             _pageSize = int.Parse(configuration["PageSize"]);
         }
 
-        public async Task<object> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<GeneratedToken> Handle(Query request, CancellationToken cancellationToken)
         {
             if (!await _unitOfWork.Users.ExistEmailAsync(request.Email, cancellationToken))
             {
@@ -48,19 +48,7 @@ public static class Login
                 role = JwtPolicies.User;
         
             GeneratedToken jwt = await _jwtAuth.GenerateJwt(user.Id, role);
-            return new {
-                jwt.Jwt,
-                user.Id, 
-                user.Name, 
-                user.Surname,
-                user.Email, 
-                user.AccountType, 
-                user.HaveAvatar, 
-                user.AddedProduct,
-                user.NotedProducts,
-                user.RatedProducts,
-                user.ViewedProducts
-            };
+            return jwt;
         }
     }
 }
